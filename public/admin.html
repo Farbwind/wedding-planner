@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hochzeitsplanung</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2e4636">
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<section class="anmeldung" id="anmeldung" hidden>
+  <form id="login-form" class="anmeldung-karte">
+    <h1>Hochzeitsplanung</h1>
+    <fieldset class="wer">
+      <legend>Wer meldet sich an?</legend>
+      <div class="wer-wahl" id="wer-wahl"></div>
+    </fieldset>
+    <label for="pw" id="pw-label">Passwort</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <p class="hilfe" id="login-hilfe" hidden></p>
+    <p class="fehler" id="login-fehler" role="alert" hidden></p>
+    <button class="knopf" type="submit" id="login-knopf">Anmelden</button>
+  </form>
+</section>
+
+<div class="app" id="app" hidden>
+  <header class="kopf">
+    <h1>Hochzeitsplanung</h1>
+    <p class="countdown" id="countdown" aria-live="polite"></p>
+    <nav class="reiter" aria-label="Bereiche">
+      <button type="button" data-reiter="gaesteliste" aria-current="page">Gästeliste</button>
+      <button type="button" data-reiter="sitzplan">Sitzplan</button>
+      <button type="button" data-reiter="todos">To-dos <span class="zaehler-marke" id="todo-marke" hidden></span></button>
+      <button type="button" data-reiter="kosten">Kosten</button>
+      <button type="button" data-reiter="inhalte">Inhalte</button>
+      <button type="button" data-reiter="qr">QR-Code</button>
+      <button type="button" data-reiter="angaben">Angaben</button>
+    </nav>
+    <div class="kopf-rechts">
+      <a href="/" target="_blank" rel="noopener">Seite ansehen</a>
+      <button type="button" class="leise" id="abmelden">Abmelden</button>
+    </div>
+  </header>
+
+  <section class="zahlen" aria-label="Stand">
+    <div class="tag-zahl">
+      <h2>Standesamt</h2>
+      <p><strong id="z-s-ja">0</strong><span id="z-s-eingeladen">/0</span> zugesagt</p>
+      <p class="z-nein"><span id="z-s-nein">0</span> abgesagt</p>
+    </div>
+    <div class="tag-zahl">
+      <h2>Kirche &amp; Feier</h2>
+      <p><strong id="z-h-ja">0</strong><span id="z-h-eingeladen">/0</span> zugesagt</p>
+      <p class="z-nein"><span id="z-h-nein">0</span> abgesagt</p>
+    </div>
+    <dl class="zahl-liste">
+      <div><dt>Vegetarisch</dt><dd id="z-veggie">0</dd></div>
+      <div><dt>Vegan</dt><dd id="z-vegan">0</dd></div>
+      <div><dt>Personen laut Antworten</dt><dd id="z-personen">0</dd></div>
+      <div><dt>Einladungen versendet</dt><dd id="z-versendet">0</dd></div>
+    </dl>
+    <p class="naechstes" id="naechstes" hidden></p>
+  </section>
+
+  <main>
+    <section data-bereich="gaesteliste">
+      <div class="platz-uebersicht" id="platz-uebersicht" aria-live="polite"></div>
+      <div class="leiste">
+        <div class="filter" role="group" aria-label="Gäste filtern">
+          <button type="button" data-plan-filter="alle" aria-pressed="true">Alle</button>
+          <button type="button" data-plan-filter="offen" aria-pressed="false">Offen</button>
+          <button type="button" data-plan-filter="ja" aria-pressed="false">Zugesagt</button>
+          <button type="button" data-plan-filter="nein" aria-pressed="false">Abgesagt</button>
+          <button type="button" data-plan-filter="nicht-versendet" aria-pressed="false">Nicht versendet</button>
+        </div>
+        <select id="plan-kategorie" aria-label="Nach Kategorie filtern"><option value="">Alle Kategorien</option><option>Familie</option><option>Freunde</option><option>Kollegen</option><option>Bekannte</option><option value="ohne">Ohne Kategorie</option></select>
+        <input type="search" id="plan-suche" placeholder="Name suchen" aria-label="Gast suchen">
+      </div>
+
+      <details class="block neu-block" id="gast-anlegen">
+        <summary>Gäste hinzufügen</summary>
+        <form id="plan-form" class="plan-form">
+          <label>Name<input name="name" maxlength="120" placeholder="Vor- und Nachname"></label>
+          <label class="haken"><input type="checkbox" name="standesamt"> Standesamt</label>
+          <label class="haken"><input type="checkbox" name="hochzeit" checked> Kirche &amp; Feier</label>
+          <label>Kategorie<select name="kategorie"><option value="">keine</option><option>Familie</option><option>Freunde</option><option>Kollegen</option><option>Bekannte</option></select></label>
+          <label>Gruppe<input name="gruppe" maxlength="60" list="plan-gruppen" placeholder="z. B. Familie Muster"></label>
+          <label class="plan-adresse">Adresse<textarea name="adresse" rows="2" placeholder="Straße Nr.&#10;PLZ Ort"></textarea></label>
+          <button class="knopf">Hinzufügen</button>
+        </form>
+        <form id="plan-viele" class="plan-viele">
+          <label>Viele auf einmal, eine Person pro Zeile. Dahinter, mit Semikolon getrennt: „S“ für auch Standesamt, „nur S“ für nur Standesamt , die Kategorie (Familie, Freunde, Kollegen, Bekannte) und alles andere als Gruppe für den Sitzplan.
+            <textarea name="liste" rows="5" placeholder="Anna Muster; S; Familie; Familie Muster&#10;Ben Beispiel; S; Freunde; Freunde Ben&#10;Oma Hilde; Familie&#10;Pfarrerin; nur S"></textarea></label>
+          <button class="knopf leise">Alle hinzufügen</button>
+        </form>
+      </details>
+
+      <details class="block karten-block" id="karten">
+        <summary>Einladungskarten und Adressen <span class="karten-zahl" id="karten-zahl"></span></summary>
+        <p class="hilfe">Pro Gruppe druckt ihr eine Karte, Gäste ohne Gruppe bekommen ihre eigene. Wohnen Gäste einer Gruppe an verschiedenen Adressen, teilt sich die Karte automatisch. Die Adresse tragt ihr beim Gast unter „Mehr“ ein, für eine Gruppe reicht sie bei einer Person.</p>
+        <div class="karten-knoepfe">
+          <button type="button" class="knopf" id="karten-drucken">Adressliste drucken</button>
+          <button type="button" class="knopf leise" id="karten-csv">CSV für Serienbrief</button>
+          <label class="haken-klein"><input type="checkbox" id="karten-nur-offen"> nur noch nicht versendete</label>
+        </div>
+        <div id="karten-druck">
+          <h2 class="nur-druck" id="karten-titel"></h2>
+          <ol class="karten-liste" id="karten-liste"></ol>
+        </div>
+      </details>
+
+      <div class="block ohne-eintrag" id="ohne-eintrag" hidden></div>
+      <div class="liste plan-liste" id="plan-liste"></div>
+      <datalist id="plan-gruppen"></datalist>
+
+      <h2 class="bereich-titel antworten-titel">Eingegangene Antworten</h2>
+      <div class="leiste">
+        <div class="filter" role="group" aria-label="Antworten filtern">
+          <button type="button" data-filter="alle" aria-pressed="true">Alle</button>
+          <button type="button" data-filter="ja" aria-pressed="false">Zusagen</button>
+          <button type="button" data-filter="nein" aria-pressed="false">Absagen</button>
+          <button type="button" data-filter="essen" aria-pressed="false">Vegetarisch/Vegan</button>
+        </div>
+        <input type="search" id="suche" placeholder="Name suchen" aria-label="Antwort suchen">
+        <a class="knopf leise" href="/api/admin/export.csv">Als Tabelle laden</a>
+      </div>
+      <div class="liste" id="antworten-liste"></div>
+    </section>
+
+    <section data-bereich="sitzplan" hidden>
+      <div class="leiste sitz-leiste">
+        <div class="filter" role="group" aria-label="Gruppieren nach">
+          <button type="button" data-gruppierung="haushalt" aria-pressed="true">Nach Antwort</button>
+          <button type="button" data-gruppierung="gruppe" aria-pressed="false">Nach Gruppe</button>
+        </div>
+        <button type="button" class="knopf leise" id="auswahl-modus" aria-pressed="false">Mehrere auswählen</button>
+        <button type="button" class="knopf leise" id="tisch-neu">Tisch hinzufügen</button>
+        <button type="button" class="knopf leise" id="gast-neu">Gast ohne Antwort hinzufügen</button>
+        <a class="knopf leise" href="/api/admin/sitzplan.csv">Als Tabelle laden</a>
+      </div>
+      <p class="hilfe sitz-hilfe">Gäste oder ganze Antworten auf einen Tisch ziehen. Tippt auf einen Namen, um ihn zu ändern, eine Gruppe zu setzen (z. B. „Familie Muster“) oder einen Tisch ohne Ziehen zu wählen. Mit „Mehrere auswählen“ markiert ihr Personen und gruppiert oder setzt sie gemeinsam.</p>
+      <div class="auswahl-leiste" id="auswahl-leiste" hidden>
+        <strong id="auswahl-zahl">0 ausgewählt</strong>
+        <input id="auswahl-gruppe" list="gruppen-liste" placeholder="Gruppe, z. B. Freunde Ben" aria-label="Gruppe für die Auswahl">
+        <button type="button" class="knopf" id="auswahl-gruppieren">Gruppe setzen</button>
+        <select id="auswahl-tisch" aria-label="Tisch für die Auswahl"></select>
+        <button type="button" class="knopf leise" id="auswahl-setzen">An Tisch setzen</button>
+        <button type="button" class="knopf leise" id="auswahl-leeren">Auswahl aufheben</button>
+      </div>
+      <div class="sitzplan">
+        <aside class="pool" data-ziel="pool" aria-label="Gäste ohne Platz">
+          <h2>Ohne Platz <span id="pool-anzahl"></span></h2>
+          <input type="search" id="pool-suche" placeholder="Name suchen" aria-label="Gast suchen">
+          <div id="pool-liste"></div>
+        </aside>
+        <div class="tische" id="tische"></div>
+      </div>
+      <dialog id="gast-dialog">
+        <form method="dialog" class="block" id="gast-form">
+          <h2 id="gast-titel">Gast</h2>
+          <label for="g-name">Name</label><input id="g-name" name="name" maxlength="80">
+          <label for="g-gruppe">Gruppe</label><input id="g-gruppe" name="gruppe" maxlength="60" list="gruppen-liste" placeholder="z. B. Familie Muster">
+          <datalist id="gruppen-liste"></datalist>
+          <label for="g-tisch">Tisch</label><select id="g-tisch" name="tisch"></select>
+          <label class="haken" id="g-alle-zeile"><input type="checkbox" name="alle"> Gruppe und Tisch für alle aus dieser Antwort übernehmen</label>
+          <div class="reihe">
+            <button class="knopf" value="ok">Speichern</button>
+            <button class="knopf leise" value="abbruch" formnovalidate>Abbrechen</button>
+            <button class="knopf leise weg" value="loeschen" id="g-loeschen" formnovalidate>Gast entfernen</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
+
+    <section data-bereich="todos" hidden>
+      <div class="leiste">
+        <div class="filter" role="group" aria-label="To-dos filtern">
+          <button type="button" data-todo-filter="offen" aria-pressed="true">Offen</button>
+          <button type="button" data-todo-filter="alle" aria-pressed="false">Alle</button>
+          <button type="button" data-todo-filter="erledigt" aria-pressed="false">Erledigt</button>
+        </div>
+        <span class="leiste-text" id="todo-stand"></span>
+        <button type="button" class="knopf leise" id="todo-vorlage" title="Fügt eine Checkliste ein, deren Fristen sich nach dem Hochzeitsdatum richten">Beispiel-To-dos einfügen</button>
+      </div>
+      <details class="block neu-block">
+        <summary>To-do hinzufügen</summary>
+        <form id="todo-form" class="todo-form">
+          <label class="ganz">Was ist zu tun?<input name="titel" maxlength="200"></label>
+          <label>Fällig am<input name="faellig" type="date"></label>
+          <label>Bereich<input name="bereich" maxlength="40" list="bereiche" placeholder="z. B. Kirche"></label>
+          <datalist id="bereiche"></datalist>
+          <label class="ganz">Notiz<input name="notiz" maxlength="1000"></label>
+          <button class="knopf">Hinzufügen</button>
+        </form>
+      </details>
+      <div id="todo-liste" class="todo-liste"></div>
+      <dialog id="kosten-dialog">
+        <form method="dialog" class="block" id="kosten-frage">
+          <h2>Erledigt! Hat das etwas gekostet?</h2>
+          <p class="hilfe" id="kosten-frage-titel"></p>
+          <div class="raster">
+            <label>Betrag in €<input name="betrag" inputmode="decimal" placeholder="0,00"></label>
+            <label>Kategorie<select name="kategorie"></select></label>
+            <label>Wo bzw. bei wem?<input name="wo" maxlength="120"></label>
+          </div>
+          <div class="reihe">
+            <button class="knopf" value="mit">Kosten eintragen</button>
+            <button class="knopf leise" value="ohne" formnovalidate>Hat nichts gekostet</button>
+            <button class="knopf leise" value="abbruch" formnovalidate>Doch nicht erledigt</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
+
+    <section data-bereich="kosten" hidden>
+      <div class="kosten-oben">
+        <figure class="block torte-block">
+          <h2>Wofür geht das Geld drauf?</h2>
+          <div class="torte-wrap"><svg id="torte" viewBox="0 0 200 200" role="img"></svg><div class="torte-mitte" id="torte-mitte"></div></div>
+          <ul class="legende" id="legende"></ul>
+        </figure>
+        <div class="block kosten-zahlen" id="kosten-zahlen"></div>
+      </div>
+      <div class="zweispaltig breit-links">
+        <div>
+          <h2 class="bereich-titel">Ausgaben</h2>
+          <details class="block neu-block">
+            <summary>Ausgabe eintragen</summary>
+            <form id="kosten-form" class="raster">
+              <label>Was?<input name="titel" maxlength="200"></label>
+              <label>Wo?<input name="wo" maxlength="120"></label>
+              <label>Betrag in €<input name="betrag" inputmode="decimal" placeholder="0,00"></label>
+              <label>Kategorie<select name="kategorie"></select></label>
+              <label>Datum<input name="datum" type="date"></label>
+              <label class="haken"><input type="checkbox" name="bezahlt" checked> schon bezahlt</label>
+              <button class="knopf">Eintragen</button>
+            </form>
+          </details>
+          <div class="liste kosten-liste" id="kosten-liste"></div>
+        </div>
+        <div>
+          <h2 class="bereich-titel">Geschenke</h2>
+          <p class="hilfe">Was ihr geschenkt bekommt. Geldgeschenke werden von den Kosten abgezogen, so seht ihr, was ihr am Ende selbst zahlt.</p>
+          <details class="block neu-block">
+            <summary>Geschenk eintragen</summary>
+            <form id="geschenk-form" class="raster">
+              <label>Von wem?<input name="von" maxlength="120"></label>
+              <label>Art<select name="art"><option>Geld</option><option>Sachgeschenk</option></select></label>
+              <label>Betrag bzw. Wert in €<input name="betrag" inputmode="decimal" placeholder="0,00"></label>
+              <label>Notiz<input name="notiz" maxlength="500"></label>
+              <button class="knopf">Eintragen</button>
+            </form>
+          </details>
+          <div class="liste" id="geschenk-liste"></div>
+        </div>
+      </div>
+    </section>
+
+    <section data-bereich="inhalte" hidden>
+      <div class="leiste">
+        <div class="filter" role="group" aria-label="Inhalt wählen">
+          <button type="button" data-sammlung="fotos" aria-pressed="true">Fotos</button>
+          <button type="button" data-sammlung="geschichte" aria-pressed="false">Unsere Geschichte</button>
+          <button type="button" data-sammlung="quiz" aria-pressed="false">Quiz</button>
+        </div>
+        <a class="knopf leise" id="inhalt-ansehen" href="/" target="_blank" rel="noopener">Auf der Seite ansehen</a>
+      </div>
+      <p class="hilfe" id="inhalt-hilfe"></p>
+      <div id="inhalt-neu"></div>
+      <div id="inhalt-liste" class="inhalt-liste"></div>
+    </section>
+
+    <section data-bereich="qr" hidden>
+      <div class="block qr-block">
+        <img src="/api/admin/qr/start.svg" alt="QR-Code zur Hochzeitsseite" class="qr-bild" width="260" height="260">
+        <div class="qr-text">
+          <h2>Ein Code für alle Einladungen</h2>
+          <p class="hilfe">Der Code führt auf <strong id="qr-link"></strong>. Druckt ihn auf jede Einladung, dort sagen die Gäste zu oder ab. Unter dem Code am besten auch die Adresse abdrucken, für alle ohne Kamera.</p>
+          <div class="reihe">
+            <a class="knopf" href="/api/admin/qr/start.svg?download">Als SVG laden (für die Druckerei)</a>
+            <a class="knopf leise" href="/api/admin/qr/start.png?download">Als PNG laden</a>
+            <button type="button" class="knopf leise" data-kopieren-start>Adresse kopieren</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-bereich="angaben" hidden>
+      <form class="block breit" id="angaben-form">
+        <h2>Was die Gäste sehen</h2>
+        <div class="raster">
+          <label>Paar<input name="couple"></label>
+          <label>Antworten bis<input name="deadline" type="date"></label>
+          <label class="ganz">Willkommenstext oben<textarea name="welcome" rows="2"></textarea></label>
+          <label class="ganz">Geschenke (Hinweis, leer lassen zum Ausblenden)<textarea name="gift" rows="3"></textarea></label>
+        </div>
+        <h3>Standesamt</h3>
+        <div class="raster">
+          <label>Wer sieht das Standesamt?
+            <select name="civil_mode"><option value="all">Alle Gäste</option><option value="marked">Niemandem (Standesamt ausblenden)</option></select>
+          </label>
+          <label>Datum<input name="civil_date" type="date"></label>
+          <label>Uhrzeit<input name="civil_time" placeholder="11:00"></label>
+          <label>Ort<input name="civil_place"></label>
+          <label>Adresse<input name="civil_address"></label>
+          <label>Kartenlink (Google Maps)<input name="civil_map" type="url" placeholder="https://maps.app.goo.gl/…"></label>
+          <label>Hinweis<input name="civil_note" placeholder="z. B. im kleinen Kreis"></label>
+        </div>
+        <h3>Kirche und Feier</h3>
+        <div class="raster">
+          <label>Datum<input name="church_date" type="date"></label>
+          <label>Uhrzeit Kirche<input name="church_time" placeholder="14:00"></label>
+          <label>Kirche<input name="church_place"></label>
+          <label>Adresse Kirche<input name="church_address"></label>
+          <label>Kartenlink Kirche<input name="church_map" type="url" placeholder="https://maps.app.goo.gl/…"></label>
+          <label>Uhrzeit Feier<input name="party_time" placeholder="ab 16:00"></label>
+          <label>Ort Feier<input name="party_place"></label>
+          <label>Adresse Feier<input name="party_address"></label>
+          <label>Kartenlink Feier<input name="party_map" type="url" placeholder="https://maps.app.goo.gl/…"></label>
+          <label>Hinweis Feier<input name="party_note" placeholder="z. B. Parken am Sportplatz"></label>
+        </div>
+        <h3>Gut zu wissen</h3>
+        <div class="raster">
+          <label class="ganz">Dresscode (leer lassen zum Ausblenden)<textarea name="info_dresscode" rows="2"></textarea></label>
+          <label class="ganz">Spiele und Überraschungen<textarea name="info_spiele" rows="3"></textarea></label>
+        </div>
+        <h3>Kontakt und Trauzeugen</h3>
+        <div class="raster">
+          <label>Eure E-Mail für Gäste<input name="paar_mail" type="email"></label>
+          <label>Euer Telefon (freiwillig)<input name="paar_tel" placeholder="0170 …"></label>
+          <label>Trauzeuge/Trauzeugin 1: Name<input name="tz1_name"></label>
+          <label>Rolle<input name="tz1_rolle" placeholder="Trauzeugin"></label>
+          <label>Telefon<input name="tz1_tel"></label>
+          <label>E-Mail<input name="tz1_mail" type="email"></label>
+          <label>Trauzeuge/Trauzeugin 2: Name<input name="tz2_name"></label>
+          <label>Rolle<input name="tz2_rolle" placeholder="Trauzeuge"></label>
+          <label>Telefon<input name="tz2_tel"></label>
+          <label>E-Mail<input name="tz2_mail" type="email"></label>
+        </div>
+        <p class="hilfe">Die Kontaktseite zeigt diese E-Mail und die Trauzeugen. Sobald mindestens ein Name eingetragen ist, erscheint im Antwortformular auch der Hinweis auf die Trauzeugen.</p>
+        <h3>Sonstiges</h3>
+        <div class="raster">
+          <label>Kontakt bei Fragen<input name="contact" placeholder="Anna: 0170 …"></label>
+          <label>Höchstzahl Personen pro Antwort<input name="max_persons_open" type="number" min="1" max="20"></label>
+        </div>
+        <h3>Impressum und Datenschutz</h3>
+        <div class="raster">
+          <label>Namen (Vor- und Nachname)<input name="imp_names" placeholder="Anna Muster und Ben Beispiel"></label>
+          <label>Anschrift<input name="imp_address" placeholder="Musterstraße 1, 12345 Musterstadt"></label>
+          <label>E-Mail<input name="imp_email" type="email"></label>
+          <label>Telefon (freiwillig)<input name="imp_phone"></label>
+          <label>Antworten automatisch löschen nach<input name="delete_after" type="date"></label>
+        </div>
+        <p class="hilfe">Die Datenschutzerklärung verspricht, dass alle Rückmeldungen nach diesem Datum gelöscht werden. Der Server macht das selbst, ladet die Liste vorher als Tabelle herunter, falls ihr sie noch braucht.</p>
+        <p class="gespeichert" id="angaben-ok" role="status" hidden>Gespeichert.</p>
+        <button class="knopf" type="submit">Speichern</button>
+      </form>
+
+      <div class="zweispaltig">
+        <form class="block" id="foto-form">
+          <h2>Foto oben auf der Seite</h2>
+          <p class="hilfe">Erscheint neben dem Namen auf der Startseite. Hochformat wirkt am besten. Ohne Foto bleibt der Anfang schlicht.</p>
+          <img id="foto-vorschau" alt="" hidden>
+          <input type="file" id="foto" accept="image/jpeg,image/png">
+          <div class="reihe"><button class="knopf" type="submit">Hochladen</button><button class="knopf leise" type="button" id="foto-weg">Entfernen</button></div>
+          <p class="hilfe" id="foto-status" role="status"></p>
+        </form>
+        <form class="block" id="pw-form">
+          <h2>Eigenes Passwort ändern</h2>
+          <label for="pw-alt">Bisher</label><input id="pw-alt" type="password" autocomplete="current-password">
+          <label for="pw-neu">Neu (mindestens 8 Zeichen)</label><input id="pw-neu" type="password" autocomplete="new-password" minlength="8">
+          <p class="hilfe" id="pw-status" role="status"></p>
+          <button class="knopf" type="submit">Ändern</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+
+<script src="/js/pruefsumme.js"></script>
+<script src="/admin.js" type="module"></script>
+<script src="/js/admin-inhalte.js" type="module"></script>
+<script src="/js/admin-sitzplan.js" type="module"></script>
+<script src="/js/admin-planung.js" type="module"></script>
+</body>
+</html>

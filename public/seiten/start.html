@@ -1,0 +1,141 @@
+<main>
+  <!-- Anfang: Namen, Datum, Foto. Texte kommen aus der Verwaltung (Reiter „Angaben“), siehe public/app.js -->
+  <section class="hero" id="start" aria-labelledby="titel">
+    <div class="hero-text">
+      <p class="hero-vorspann">Wir heiraten</p>
+      <h1 id="titel" class="namen"><span data-feld="name1">Anna</span> <span class="und">&amp;</span> <span data-feld="name2">Ben</span></h1>
+      <p class="hero-datum" data-feld="hero-datum"></p>
+      <p class="gruss" data-feld="gruss" hidden></p>
+      <p class="willkommen" data-feld="willkommen"></p>
+      <div class="hero-knoepfe">
+        <a class="knopf" href="#buchen">Zusagen oder absagen</a>
+        <a class="knopf-leise" href="#termine">Zu den Terminen</a>
+      </div>
+      <a class="kalender-link" href="/kalender.ics"><svg aria-hidden="true"><use href="#kalender"/></svg>Termine in den Kalender</a>
+    </div>
+    <figure class="hero-bild" data-feld="foto-rahmen" hidden>
+      <img data-feld="foto" alt="Foto vom Brautpaar" fetchpriority="high">
+    </figure>
+  </section>
+
+  <section class="termine" id="termine" aria-labelledby="termine-titel">
+    <h2 id="termine-titel">Termine</h2>
+    <ol class="termin-liste">
+      <li class="termin" data-feld="etappe1">
+        <p class="termin-datum" data-feld="e1-datum"></p>
+        <h3>Standesamt</h3>
+        <p class="termin-zeit" data-feld="e1-zeit"></p>
+        <p class="termin-ort"><strong data-feld="e1-titel"></strong><br><span data-feld="e1-adresse"></span></p>
+        <p class="termin-notiz" data-feld="e1-notiz"></p>
+        <div class="termin-links">
+          <a data-feld="e1-karte" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#pin"/></svg>Auf der Karte anzeigen</a>
+          <a href="/kalender.ics?termin=standesamt"><svg aria-hidden="true"><use href="#kalender"/></svg>In den Kalender</a>
+        </div>
+      </li>
+      <li class="termin">
+        <p class="termin-datum" data-feld="e2-datum"></p>
+        <h3>Kirche</h3>
+        <p class="termin-zeit" data-feld="kirche-zeit"></p>
+        <p class="termin-ort"><strong data-feld="kirche-ort"></strong><br><span data-feld="kirche-adresse"></span></p>
+        <div class="termin-links">
+          <a data-feld="kirche-karte" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#pin"/></svg>Auf der Karte anzeigen</a>
+          <a href="/kalender.ics?termin=hochzeit"><svg aria-hidden="true"><use href="#kalender"/></svg>In den Kalender</a>
+        </div>
+      </li>
+      <li class="termin">
+        <p class="termin-datum" data-feld="e3-datum"></p>
+        <h3>Feier</h3>
+        <p class="termin-zeit" data-feld="feier-zeit"></p>
+        <p class="termin-ort"><strong data-feld="feier-ort"></strong><br><span data-feld="feier-adresse"></span></p>
+        <p class="termin-notiz" data-feld="feier-notiz"></p>
+        <div class="termin-links">
+          <a data-feld="feier-karte" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#pin"/></svg>Auf der Karte anzeigen</a>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="buchen" id="buchen" aria-labelledby="buchen-titel">
+    <h2 id="buchen-titel" data-feld="frage">Kommt ihr?</h2>
+    <p class="frist" data-feld="frist"></p>
+    <p class="hinweis-fehler" data-feld="code-unbekannt" hidden>Den Einladungslink kennen wir leider nicht. Ihr könnt trotzdem hier antworten.</p>
+
+    <form id="formular" class="buchung" novalidate>
+      <input type="text" name="website" class="falle" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <fieldset class="reiter">
+        <legend class="sr">Eure Antwort</legend>
+        <label><input type="radio" name="attending" value="ja"><span data-feld="ja-text">Wir sind dabei</span></label>
+        <label><input type="radio" name="attending" value="nein"><span data-feld="nein-text">Wir können leider nicht</span></label>
+      </fieldset>
+
+      <div class="felder">
+        <div class="feld breit">
+          <label for="name" data-feld="name-label">Name</label>
+          <input id="name" name="name" autocomplete="name" required maxlength="120" placeholder="Vor- und Nachname">
+        </div>
+
+        <div class="nur-ja feld" hidden>
+          <span class="label" id="personen-label">Personen</span>
+          <div class="zaehler" role="group" aria-labelledby="personen-label">
+            <button type="button" class="zaehler-knopf" data-schritt="-1" aria-label="Eine Person weniger"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <output id="personen" aria-live="polite">1</output>
+            <button type="button" class="zaehler-knopf" data-schritt="1" aria-label="Eine Person mehr"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <p class="feld-hilfe" data-feld="max-hinweis"></p>
+        </div>
+
+        <div class="nur-ja feld breit" data-feld="mitreisende-feld" hidden>
+          <label for="companions">Wer kommt noch mit?</label>
+          <textarea id="companions" name="companions" rows="2" maxlength="600" placeholder="Namen aller, die mitkommen"></textarea>
+        </div>
+
+        <div class="nur-ja feld breit essen" role="group" aria-labelledby="essen-titel" hidden>
+          <span class="label" id="essen-titel">Essenswunsch <small>freiwillig</small></span>
+          <div class="menue-wahl">
+            <label class="chip"><input type="checkbox" name="vegetarian"><span>Vegetarisch</span></label>
+            <label class="chip"><input type="checkbox" name="vegan"><span>Vegan</span></label>
+          </div>
+        </div>
+
+        <div class="feld breit">
+          <label for="message">Nachricht an uns <small>freiwillig</small></label>
+          <textarea id="message" name="message" rows="3" maxlength="1500" aria-describedby="nachricht-hilfe"></textarea>
+          <p class="feld-hilfe" id="nachricht-hilfe">Bei Fragen helfen euch auch unsere Trauzeugen, ihr findet sie unter <a href="/kontakt">Kontakt</a>.</p>
+        </div>
+      </div>
+
+      <p class="fehler" id="fehler" role="alert" hidden></p>
+      <button class="knopf absenden" type="submit" data-feld="absenden">Zusage senden</button>
+      <p class="hinweis-datenschutz">Eure Angaben sehen nur wir, mehr dazu in der <a href="/datenschutz">Datenschutzerklärung</a>.</p>
+    </form>
+
+    <div class="bestaetigung" id="bestaetigung" hidden tabindex="-1">
+      <div class="bestaetigung-karte" data-feld="karte"></div>
+      <p class="bestaetigung-text" data-feld="zusammenfassung"></p>
+      <div class="bestaetigung-knoepfe">
+        <a class="knopf" href="/kalender.ics" data-feld="kalender-knopf"><svg aria-hidden="true" class="knopf-icon"><use href="#kalender"/></svg>Termine in den Kalender</a>
+        <button type="button" class="knopf-leise" id="aendern">Antwort ändern</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="momente" aria-labelledby="momente-titel" data-feld="momente" hidden>
+    <h2 id="momente-titel">Momente von uns</h2>
+    <div class="momente-raster" data-feld="momente-raster"></div>
+  </section>
+
+  <section class="geschenk" aria-labelledby="geschenk-titel" data-feld="geschenk-bereich">
+    <h2 id="geschenk-titel">Geschenke</h2>
+    <p data-feld="geschenk"></p>
+  </section>
+
+  <section class="wissen" aria-labelledby="wissen-titel">
+    <h2 id="wissen-titel">Gut zu wissen</h2>
+    <dl>
+      <div data-feld="wissen-dresscode"><dt>Dresscode</dt><dd data-feld="info-dresscode"></dd></div>
+      <div data-feld="wissen-spiele"><dt>Überraschungen</dt><dd data-feld="info-spiele"></dd></div>
+      <div><dt>Fragen?</dt><dd>Schreibt uns oder unseren Trauzeugen, alle Wege stehen unter <a href="/kontakt">Kontakt</a>.</dd></div>
+    </dl>
+  </section>
+</main>
