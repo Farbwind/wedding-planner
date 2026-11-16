@@ -2,7 +2,7 @@
 # Danach: Gästeseite auf http://localhost:8080, Verwaltung auf http://localhost:8080/admin
 services:
   hochzeit:
-    image: ghcr.io/maxkrde/wedding-planner:latest
+    image: ghcr.io/farbwind/wedding-planner:latest
     # Zum Selbstbauen aus dem Quellcode statt des fertigen Images: die Zeile "image" löschen und diese einkommentieren
     # build: .
     container_name: hochzeit

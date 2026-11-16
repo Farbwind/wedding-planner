@@ -48,7 +48,7 @@ Du brauchst nur [Docker](https://docs.docker.com/get-docker/).
 
 ```bash
 mkdir hochzeit && cd hochzeit
-curl -O https://raw.githubusercontent.com/maxkrde/wedding-planner/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Farbwind/wedding-planner/main/docker-compose.yml
 docker compose up -d
 ```
 
@@ -64,7 +64,7 @@ Ohne Compose geht es auch mit einem Befehl:
 ```bash
 docker run -d --name hochzeit -p 8080:3000 -v hochzeit-daten:/data \
   -e PUBLIC_URL=http://localhost:8080 -e ADMIN_USERS="Anna,Ben" \
-  ghcr.io/maxkrde/wedding-planner:latest
+  ghcr.io/farbwind/wedding-planner:latest
 ```
 
 ## Als Erstes in der Verwaltung
@@ -111,7 +111,7 @@ Deine Daten bleiben erhalten.
 
 Texte, Termine und Fotos änderst du in der Verwaltung. Für ein anderes Aussehen oder neue Funktionen hilft dir ein KI-Modell mit Zugriff auf deinen Projektordner, zum Beispiel Claude Code, Cursor oder ChatGPT mit Dateizugriff.
 
-1. Projekt herunterladen: `git clone https://github.com/maxkrde/wedding-planner.git`
+1. Projekt herunterladen: `git clone https://github.com/Farbwind/wedding-planner.git`
 2. Den Ordner im KI-Werkzeug öffnen.
 3. Diesen Prompt einfügen und die Stellen in eckigen Klammern ausfüllen:
 
