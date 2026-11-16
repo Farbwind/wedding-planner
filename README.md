@@ -4,6 +4,27 @@ Eine eigene Hochzeitsseite mit Verwaltung, die du selbst betreibst. Deine Gäste
 
 *English in short: a self-hosted wedding website with RSVP and a planning back office (guest list, seating plan, to-dos, budget). One Docker container, SQLite, no external services. The interface is in German.*
 
+## So sieht es aus
+
+![Gästeseite am Computer und Handy](docs/mockup-startseite.png)
+
+![Verwaltung mit Gästeliste, Sitzplan, To-dos und Kosten](docs/mockup-verwaltung.png)
+
+<details>
+<summary>Weitere Ansichten</summary>
+
+![Termine](docs/screenshots/termine-desktop.png)
+
+![Antwortformular](docs/screenshots/formular-desktop.png)
+
+![Sitzplan](docs/screenshots/verwaltung-sitzplan.png)
+
+![Einladungskarten pro Gruppe](docs/screenshots/verwaltung-karten.png)
+
+</details>
+
+Die Bilder zeigen Beispieldaten. Das Design der Gästeseite ist bewusst schlicht gehalten, damit du es leicht an euren Stil anpassen kannst.
+
 ## Was drin ist
 
 **Für die Gäste**

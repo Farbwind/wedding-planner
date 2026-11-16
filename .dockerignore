@@ -3,6 +3,7 @@
 node_modules
 data
 *.md
+docs
 LICENSE
 docker-compose.yml
 .DS_Store
