@@ -10,8 +10,9 @@ import QRCode from 'qrcode';
 import { inhalte } from './inhalte.js';
 import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
+import { gaestefotos } from './gaestefotos.js';
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -105,6 +106,8 @@ const DEFAULTS = {
   tz2_name: '', tz2_rolle: 'Trauzeuge', tz2_tel: '', tz2_mail: '',
   // Platz pro Tag, für die Übersicht in der Gästeliste
   platz_standesamt: '', platz_feier: '',
+  // Gästefotos: Galerie auf /fotos für Gäste sichtbar ('1') oder nur in der Verwaltung ('0')
+  galerie_gaeste: '1',
 };
 const getSettings = () => {
   const s = { ...DEFAULTS };
@@ -367,12 +370,17 @@ function rechtsSeite(art) {
     <p>Ihr könnt eure Einwilligung jederzeit widerrufen, eine kurze Nachricht an uns genügt. Dann löschen wir eure Rückmeldung. Spätestens am <strong>${e(loeschDatum)}</strong> löscht der Server alle Rückmeldungen automatisch.</p>
 
     <h2>4. Speicherung auf eurem Gerät</h2>
-    <p>Wir setzen keine Cookies für Gäste und nutzen keine Analyse- oder Werbedienste. Nach dem Absenden speichert euer Browser einen zufälligen Schlüssel und eure Antwort im lokalen Speicher. So seht ihr eure Bestätigung beim nächsten Besuch wieder und könnt die Antwort ändern. Das ist für diese von euch gewünschte Funktion unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG). Ihr könnt den Speicher jederzeit in den Browser-Einstellungen löschen.</p>
+    <p>Wir setzen keine Cookies für Gäste und nutzen keine Analyse- oder Werbedienste. Nach dem Absenden speichert euer Browser einen zufälligen Schlüssel und eure Antwort im lokalen Speicher. So seht ihr eure Bestätigung beim nächsten Besuch wieder und könnt die Antwort ändern. Das ist für diese von euch gewünschte Funktion unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG). Auf der Fotoseite merkt sich euer Browser außerdem euren Namen, damit ihr ihn nicht jedes Mal neu eintippen müsst. Ihr könnt den Speicher jederzeit in den Browser-Einstellungen löschen.</p>
 
-    <h2>5. Schriften und Karten</h2>
+    <h2>5. Fotos von der Hochzeit</h2>
+    <p>Auf der Seite „Fotos“ könnt ihr Bilder von unserer Hochzeit hochladen. Wir speichern dabei das Foto, den Namen, den ihr angebt, den Abschnitt (zum Beispiel Kirche oder Feier) und den Zeitpunkt. Euer Browser verkleinert jedes Foto vor dem Hochladen und speichert es neu, dabei fallen eingebettete Zusatzdaten wie Aufnahmeort und Kamera weg. Die Fotos liegen nur auf unserem eigenen Server.</p>
+    <p>Sehen können die Fotos wir und, solange wir die Galerie freigeschaltet haben, alle Besucher dieser Seite, mit dem Namen, den ihr angegeben habt. Ladet bitte nur Fotos hoch, die ihr selbst gemacht habt, und nur, wenn die Abgebildeten damit einverstanden sind. Rechtsgrundlage ist eure Einwilligung durch das Hochladen (Art. 6 Abs. 1 lit. a DSGVO).</p>
+    <p>Wir bewahren die Fotos als Erinnerung an unsere Hochzeit auf. Wenn ihr ein Foto entfernt haben möchtet, weil ihr es hochgeladen habt oder darauf zu sehen seid, schreibt uns kurz, dann löschen wir es.</p>
+
+    <h2>6. Schriften und Karten</h2>
     <p>Alle Schriften liefern wir von unserem eigenen Server aus. Beim Aufruf entsteht keine Verbindung zu Google oder anderen Schriftanbietern. Die Knöpfe „Auf der Karte anzeigen“ sind einfache Links zu Google Maps. Erst wenn ihr darauf tippt, öffnet sich Google Maps, dann gilt die <a href="https://policies.google.com/privacy?hl=de" rel="noopener">Datenschutzerklärung von Google</a>.</p>
 
-    <h2>6. Eure Rechte</h2>
+    <h2>7. Eure Rechte</h2>
     <p>Ihr habt das Recht auf Auskunft über eure gespeicherten Daten (Art. 15 DSGVO), auf Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und auf Widerspruch gegen Verarbeitungen aus berechtigtem Interesse (Art. 21). Eine erteilte Einwilligung könnt ihr jederzeit für die Zukunft widerrufen (Art. 7 Abs. 3). Schreibt uns dafür einfach. Außerdem könnt ihr euch bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO), zum Beispiel in dem Bundesland, in dem ihr wohnt.</p>
 
   `;
@@ -651,7 +659,8 @@ async function admin(req, res, url) {
 const geruest = seitenGeruest({ VERSION, PUB, getSettings });
 const behandleInhalte = inhalte({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, gruppenAusListe: () => behandlePlanung.gruppenJeAntwort() });
 const behandlePlanung = planung({ db, json, send, str, int, sessionUser, getSettings });
-const UNTERSEITEN = ['geschichte', 'quiz', 'kontakt'];
+const behandleFotos = gaestefotos({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, getSettings, PUBLIC_URL });
+const UNTERSEITEN = ['geschichte', 'quiz', 'fotos', 'kontakt'];
 
 const server = http.createServer(async (req, res) => {
   try {
@@ -668,6 +677,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (await behandleInhalte(req, res, url)) return;
     if (await behandlePlanung(req, res, url)) return;
+    if (await behandleFotos(req, res, url)) return;
     if (p.startsWith('/api/admin/')) return await admin(req, res, url);
     if (p === '/kalender.ics') {
       const welche = ['standesamt', 'hochzeit'].includes(url.searchParams.get('termin')) ? url.searchParams.get('termin') : 'alle';

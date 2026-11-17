@@ -477,3 +477,34 @@ body.zieht, body.zieht * { cursor: grabbing !important; user-select: none; }
 
 [data-bild-status].fehler { color: var(--nein); font-weight: 600; }
 .inhalt-form.ziel { outline: 2px dashed var(--einband); outline-offset: 4px; }
+
+/* Gästefotos */
+.gf-galerie { margin: 4px 0 6px; font-weight: 500; }
+.gf-abschnitte { display: grid; gap: 12px; margin: 6px 0 16px; }
+.gf-abschnitt { display: grid; grid-template-columns: 88px 1fr auto; gap: 16px; align-items: center; padding: 12px; border-radius: 12px; box-shadow: 0 0 0 1px var(--linie); background: #fff; }
+.gf-qr img { display: block; width: 88px; height: 88px; border-radius: 8px; box-shadow: 0 0 0 1px var(--linie); }
+.gf-abschnitt-felder { display: grid; grid-template-columns: 1fr 160px 120px auto; gap: 8px 14px; align-items: end; }
+.gf-abschnitt-felder label:not(.haken-klein) { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; }
+.gf-abschnitt-felder .haken-klein { padding-bottom: 12px; }
+.gf-abschnitt-info { grid-column: 1 / -1; margin: 0; font-size: .85rem; color: var(--tinte-weich); }
+.link-knopf { border: 0; background: none; padding: 0; font: inherit; color: var(--ja); text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
+.gf-abschnitt-knoepfe { display: flex; gap: 6px; }
+.gf-abschnitt-knoepfe .knopf { margin: 0; padding: 8px 12px; }
+.gf-neu { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 12px; }
+.gf-neu label { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; }
+.gf-neu .knopf { margin: 0; }
+.gf-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; margin-top: 14px; }
+.gf-foto { margin: 0; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--linie); display: grid; }
+.gf-foto img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--papier); }
+.gf-foto.versteckt img { opacity: .4; }
+.gf-foto figcaption { display: grid; gap: 6px; padding: 10px 12px 12px; font-size: .85rem; }
+.gf-foto figcaption span { color: var(--tinte-weich); }
+.gf-foto select { font-size: .85rem; padding: 6px 8px; }
+.gf-foto-knoepfe { display: flex; flex-wrap: wrap; gap: 6px; }
+.gf-foto-knoepfe .knopf { margin: 0; padding: 6px 10px; font-size: .8rem; }
+@media (max-width: 760px) {
+  .gf-abschnitt { grid-template-columns: 72px 1fr; }
+  .gf-qr img { width: 72px; height: 72px; }
+  .gf-abschnitt-felder { grid-template-columns: 1fr; }
+  .gf-abschnitt-knoepfe { grid-column: 1 / -1; }
+}

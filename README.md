@@ -31,6 +31,7 @@ Die Bilder zeigen Beispieldaten. Das Design der Gästeseite ist bewusst schlicht
 - Startseite mit Namen, Terminen, Karten-Links und Kalenderdatei (.ics)
 - Zu- und Absage mit Personenzahl, Mitkommenden und Essenswunsch (vegetarisch, vegan)
 - Seiten für Geschichte, Quiz, Kontakt, Impressum und Datenschutz
+- Fotos teilen: Gäste laden während der Hochzeit ihre Bilder hoch, sortiert nach Abschnitten wie Standesamt, Kirche und Feier, mit Galerie
 - Funktioniert auf dem Handy, keine Cookies, keine Fremdanbieter, Schriften liegen lokal
 
 **Für euch (unter `/admin`)**
@@ -40,6 +41,7 @@ Die Bilder zeigen Beispieldaten. Das Design der Gästeseite ist bewusst schlicht
 - To-do-Liste mit Beispiel-Checkliste, die sich nach eurem Hochzeitsdatum richtet
 - Kosten mit Diagramm, Kosten pro Gast und Geschenke
 - Fotos, Geschichte und Quiz pflegen, QR-Code für die Einladung
+- Gästefotos: Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP
 - Zwei bis sechs Zugänge, alle Angaben ohne Programmieren änderbar
 
 ## Schnellstart
@@ -74,6 +76,7 @@ docker run -d --name hochzeit -p 8080:3000 -v hochzeit-daten:/data \
 3. Reiter **Inhalte**: die Beispiele für Geschichte und Quiz durch eure ersetzen.
 4. Reiter **To-dos**: „Beispiel-To-dos einfügen“ legt eine Checkliste an, deren Fristen sich nach dem Hochzeitsdatum richten.
 5. Reiter **QR-Code**: Code herunterladen und auf die Einladung drucken.
+6. Reiter **Gästefotos**: Abschnitte prüfen (Datum und Uhrzeit „ab“), bis zur Hochzeit schließen und den Aufsteller mit den QR-Codes drucken. Ohne QR-Code wählt die Fotoseite automatisch den Abschnitt, der gerade dran ist.
 
 ## Einstellungen des Containers
 
@@ -84,7 +87,7 @@ docker run -d --name hochzeit -p 8080:3000 -v hochzeit-daten:/data \
 | `ADMIN_PASSWORD` | Erstes Passwort für Zugänge ohne Passwort, mindestens 8 Zeichen | nicht gesetzt |
 | `TZ` | Zeitzone | `Europe/Berlin` |
 
-Alle Daten liegen im Volume `/data` (SQLite-Datenbank und hochgeladene Fotos).
+Alle Daten liegen im Volume `/data`: SQLite-Datenbank, Bilder der Website und, getrennt davon, die Fotos der Gäste in `/data/gaestefotos/<abschnitt>/`.
 
 ## Im Internet betreiben
 

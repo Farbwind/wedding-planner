@@ -18,6 +18,7 @@ Danach `http://localhost:8080` (Gäste) und `http://localhost:8080/admin` (Verwa
 | `seiten.js` | Rahmen aller Gästeseiten: Kopf, Menü (`MENUE`), Fuß. Namen und Titel kommen aus den Angaben |
 | `inhalte.js` | Fotos, Geschichte, Quiz (Sammlungen) und Sitzplan, dazu Beispielinhalte beim ersten Start |
 | `planung.js` | Gästeliste, Einladungskarten, To-dos (mit Beispiel-Checkliste), Kosten, Geschenke |
+| `gaestefotos.js` | Fotos der Gäste: Abschnitte, Upload (`POST /api/gaestefotos`), Galerie, ZIP-Download, QR-Codes und Druckvorlage. Ablage in `/data/gaestefotos/<abschnitt>/` |
 | `public/style.css` | Gesamtes Aussehen der Gästeseiten. Farben, Schriften und Rundungen stehen oben unter `:root` |
 | `public/seiten/*.html` | Inhalt der Gästeseiten (ohne Kopf und Fuß). Startseite: `start.html` |
 | `public/app.js` | Logik der Startseite: lädt `/api/info`, füllt die Felder, steuert das Antwortformular |
@@ -48,7 +49,7 @@ Namen, Termine, Orte, Texte, Kontakt, Impressum stehen in der Tabelle `settings`
 
 ## Datenbank und Schnittstellen
 
-- Tabellen: `settings`, `responses` (Antworten), `invites` (optionale persönliche Einladungslinks `/p/CODE`), `einladung` (Gästeliste), `todos`, `kosten`, `geschenke`, `geschichte`, `quiz`, `fotos`, `tische`, `sitz`, `gast_info`, `gaeste_extra`, `users`, `sessions`
-- Öffentlich: `GET /api/info`, `GET /api/seite`, `POST /api/rsvp`, `GET /kalender.ics`
+- Tabellen: `settings`, `responses` (Antworten), `invites` (optionale persönliche Einladungslinks `/p/CODE`), `einladung` (Gästeliste), `todos`, `kosten`, `geschenke`, `geschichte`, `quiz`, `fotos`, `tische`, `sitz`, `gast_info`, `gaeste_extra`, `foto_abschnitte`, `gaestefotos`, `users`, `sessions`
+- Öffentlich: `GET /api/info`, `GET /api/seite`, `POST /api/rsvp`, `GET /kalender.ics`, `GET` und `POST /api/gaestefotos`, Fotos unter `/gaestefotos/<id>.jpg`
 - Verwaltung unter `/api/admin/...`, nur mit Anmeldung (Cookie `hz_s`)
 - Neue Spalten werden beim Start mit `ALTER TABLE ... ADD COLUMN` ergänzt, wenn sie fehlen (Beispiele in `planung.js`). Bestehende Daten dürfen dabei nie verloren gehen.

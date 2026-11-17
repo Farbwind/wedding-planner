@@ -8,6 +8,7 @@ const MENUE = [
   ['/#termine', 'Termine', 'start'],
   ['/geschichte', 'Unsere Geschichte', 'geschichte'],
   ['/quiz', 'Quiz', 'quiz'],
+  ['/fotos', 'Fotos', 'fotos'],
   ['/kontakt', 'Kontakt', 'kontakt'],
 ];
 
@@ -31,7 +32,7 @@ export function seitenGeruest({ VERSION, PUB, getSettings }) {
     const [a = voll, b = ''] = voll.split(/\s*&\s*|\s+und\s+/).map((x) => x.trim());
     return { voll, a, b, initialen: [a, b].filter(Boolean).map((x) => x[0].toUpperCase()) };
   }
-  const titelVon = { start: (p) => `${p.voll} heiraten`, geschichte: () => 'Unsere Geschichte', quiz: () => 'Quiz', kontakt: () => 'Kontakt' };
+  const titelVon = { start: (p) => `${p.voll} heiraten`, geschichte: () => 'Unsere Geschichte', quiz: () => 'Quiz', fotos: () => 'Eure Fotos', kontakt: () => 'Kontakt' };
 
   function layout({ name, titel, inhalt, skript, beschreibung }) {
     const p = paar();
@@ -66,13 +67,14 @@ ${inhalt}
   <p data-feld="kontakt" hidden></p>
   <nav class="fuss-links" aria-label="Weitere Seiten"><a href="/kontakt">Kontakt</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></nav>
 </footer>
+<script src="${v('/js/pruefsumme.js')}"></script>
 <script src="${v('/js/basis.js')}"></script>
 ${skript ? `<script src="${v(skript)}" type="module"></script>` : ''}
 </body>
 </html>`;
   }
 
-  const SKRIPTE = { start: '/app.js', geschichte: '/js/geschichte.js', quiz: '/js/quiz.js', kontakt: '/js/kontakt.js' };
+  const SKRIPTE = { start: '/app.js', geschichte: '/js/geschichte.js', quiz: '/js/quiz.js', fotos: '/js/fotos.js', kontakt: '/js/kontakt.js' };
 
   // Die Seite wird bei jedem Aufruf frisch gebaut, damit geänderte Namen aus der Verwaltung sofort erscheinen
   function seite(name) {

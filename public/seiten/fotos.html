@@ -1,0 +1,46 @@
+<main class="unterseite gaestefotos">
+  <header class="seitenkopf">
+    <h1>Eure Fotos</h1>
+    <p class="einleitung">Ihr habt schöne Momente eingefangen? Ladet sie hier hoch. So sammeln wir alle Bilder von unserem Tag an einem Ort.</p>
+  </header>
+
+  <section class="foto-upload" aria-labelledby="upload-titel">
+    <h2 id="upload-titel" class="sr">Fotos hochladen</h2>
+    <form id="upload-form" class="beitrag-form upload-form" novalidate hidden>
+      <div class="upload-felder">
+        <div class="feld">
+          <span class="label" id="abschnitt-label">Wo sind die Fotos entstanden?</span>
+          <div class="abschnitt-wahl" role="radiogroup" aria-labelledby="abschnitt-label" data-feld="abschnitte"></div>
+          <p class="feld-hilfe" data-feld="abschnitt-hinweis" hidden></p>
+        </div>
+        <div class="feld">
+          <label for="f-name">Dein Name</label>
+          <input id="f-name" name="name" autocomplete="name" maxlength="80" placeholder="Damit wir wissen, von wem die Bilder sind">
+        </div>
+        <label class="foto-wahl foto-wahl-gross">
+          <input type="file" name="fotos" accept="image/*" multiple>
+          <span><svg aria-hidden="true"><use href="#kamera"/></svg><b>Fotos auswählen</b><small>Mehrere auf einmal sind möglich</small></span>
+        </label>
+      </div>
+      <p class="fehler" data-feld="fehler" role="alert" hidden></p>
+      <ul class="upload-liste" data-feld="warteschlange" aria-live="polite"></ul>
+      <p class="hinweis-datenschutz">Eure Fotos sehen wir und, solange die Galerie offen ist, auch die anderen Gäste. Mehr in der <a href="/datenschutz">Datenschutzerklärung</a>.</p>
+    </form>
+    <p class="leer-hinweis" data-feld="geschlossen" hidden>Das Hochladen ist gerade geschlossen. Am Hochzeitstag geht es hier los.</p>
+  </section>
+
+  <section class="foto-galerie" aria-labelledby="galerie-titel" data-feld="galerie" hidden>
+    <h2 id="galerie-titel">Galerie</h2>
+    <div class="galerie-filter" role="group" aria-label="Abschnitt wählen" data-feld="filter"></div>
+    <div class="galerie-raster" data-feld="raster"></div>
+    <p class="leer-hinweis" data-feld="galerie-leer" hidden>Hier erscheinen bald die ersten Fotos.</p>
+  </section>
+
+  <dialog class="leuchtkasten" data-feld="leuchtkasten" aria-label="Foto">
+    <img data-feld="gross" alt="">
+    <p class="leuchtkasten-text" data-feld="gross-text"></p>
+    <button type="button" class="leuchtkasten-knopf zurueck" data-schritt="-1" aria-label="Vorheriges Foto">‹</button>
+    <button type="button" class="leuchtkasten-knopf weiter" data-schritt="1" aria-label="Nächstes Foto">›</button>
+    <button type="button" class="leuchtkasten-zu" data-zu aria-label="Schließen">×</button>
+  </dialog>
+</main>

@@ -36,6 +36,7 @@
       <button type="button" data-reiter="todos">To-dos <span class="zaehler-marke" id="todo-marke" hidden></span></button>
       <button type="button" data-reiter="kosten">Kosten</button>
       <button type="button" data-reiter="inhalte">Inhalte</button>
+      <button type="button" data-reiter="gaestefotos">Gästefotos <span class="zaehler-marke" id="gf-marke" hidden></span></button>
       <button type="button" data-reiter="qr">QR-Code</button>
       <button type="button" data-reiter="angaben">Angaben</button>
     </nav>
@@ -273,6 +274,31 @@
       <div id="inhalt-liste" class="inhalt-liste"></div>
     </section>
 
+    <section data-bereich="gaestefotos" hidden>
+      <div class="leiste">
+        <div class="filter" role="group" aria-label="Abschnitt filtern" id="gf-filter"></div>
+        <a class="knopf" id="gf-zip" href="/api/admin/gaestefotos/zip">Alle als ZIP laden</a>
+      </div>
+      <p class="hilfe" id="gf-stand"></p>
+      <details class="block neu-block" id="gf-einrichtung">
+        <summary>Abschnitte, QR-Codes und Galerie</summary>
+        <p class="hilfe">Jeder Abschnitt hat einen eigenen Ordner und einen eigenen QR-Code. Wer den Code scannt, landet direkt beim Hochladen, der Abschnitt ist schon ausgewählt. Geschlossene Abschnitte nehmen keine Fotos an, ihre Bilder bleiben aber in der Galerie. Ohne Code wählt die Seite <a href="/fotos" target="_blank" rel="noopener">/fotos</a> automatisch den Abschnitt vor, der gerade dran ist: nach Datum und, wenn es mehrere am selben Tag gibt, nach der Uhrzeit „ab“. Gäste können die Auswahl jederzeit ändern.</p>
+        <label class="haken gf-galerie"><input type="checkbox" id="gf-galerie"> Galerie für Gäste sichtbar (alle sehen die hochgeladenen Fotos auf /fotos)</label>
+        <div id="gf-abschnitte" class="gf-abschnitte"></div>
+        <form id="gf-neu" class="gf-neu">
+          <label>Neuer Abschnitt<input name="name" maxlength="60" placeholder="z. B. Sektempfang"></label>
+          <label>Datum<input name="datum" type="date"></label>
+          <label>ab Uhrzeit<input name="ab" type="time"></label>
+          <button class="knopf">Hinzufügen</button>
+        </form>
+        <div class="reihe">
+          <a class="knopf leise" href="/api/admin/gaestefotos/aufsteller" target="_blank" rel="noopener">Aufsteller mit QR-Codes drucken</a>
+          <a class="knopf leise" href="/api/admin/gaestefotos/qr/alle.svg?download">QR-Code ohne Abschnitt (SVG)</a>
+        </div>
+      </details>
+      <div class="gf-raster" id="gf-raster"></div>
+    </section>
+
     <section data-bereich="qr" hidden>
       <div class="block qr-block">
         <img src="/api/admin/qr/start.svg" alt="QR-Code zur Hochzeitsseite" class="qr-bild" width="260" height="260">
@@ -386,5 +412,6 @@
 <script src="/js/admin-inhalte.js" type="module"></script>
 <script src="/js/admin-sitzplan.js" type="module"></script>
 <script src="/js/admin-planung.js" type="module"></script>
+<script src="/js/admin-fotos.js" type="module"></script>
 </body>
 </html>
