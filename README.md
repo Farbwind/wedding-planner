@@ -1,12 +1,52 @@
 # Wedding Planner
 
-Eine eigene Hochzeitsseite mit Verwaltung, die du selbst betreibst. Deine Gäste sagen online zu oder ab, du behältst Gästeliste, Sitzplan, Aufgaben und Kosten im Blick. Alles läuft in einem einzigen Docker-Container, die Daten bleiben bei dir.
+Eine eigene Hochzeitsseite mit Verwaltung, die du selbst betreibst. Deine Gäste sagen online zu oder ab und laden am Hochzeitstag ihre Fotos hoch, du behältst Gästeliste, Sitzplan, Aufgaben und Kosten im Blick. Alles läuft in einem einzigen Docker-Container, die Daten bleiben bei dir.
 
-*English in short: a self-hosted wedding website with RSVP and a planning back office (guest list, seating plan, to-dos, budget). One Docker container, SQLite, no external services. The interface is in German.*
+*English in short: a self-hosted wedding website with RSVP, guest photo sharing (QR code per part of the day, shared gallery, ZIP download) and a planning back office (guest list, seating plan, to-dos, budget). One Docker container, SQLite, no external services. The interface is in German.*
 
 ## So sieht es aus
 
 ![Gästeseite am Computer und Handy](docs/mockup-startseite.png)
+
+## Fotos von allen Gästen an einem Ort
+
+Nach der Hochzeit hat jeder Gast ein paar gute Bilder, aber niemand hat alle. Hier laden deine Gäste ihre Fotos direkt auf eure Seite hoch. Ohne App, ohne Konto und ohne Cloud eines Fremdanbieters: Die Bilder landen auf deinem eigenen Server.
+
+![Fotos hochladen und Galerie am Computer und Handy](docs/mockup-fotos.jpg)
+
+**So läuft es ab**
+
+1. Du druckst für jeden Abschnitt des Tages (Standesamt, Kirche, Feier oder was ihr selbst anlegt) einen Aufsteller mit eigenem QR-Code.
+2. Gäste scannen den Code, tragen ihren Namen ein und wählen ihre Fotos aus, auch viele auf einmal. Der Abschnitt ist schon vorausgewählt.
+3. Alle Bilder erscheinen sofort in einer Galerie, nach Abschnitten filterbar und mit Großansicht zum Durchblättern.
+4. Danach lädst du alles mit einem Klick als ZIP herunter, sortiert in einen Ordner pro Abschnitt.
+
+![Verwaltung der Gästefotos mit gedruckten Aufstellern](docs/mockup-gaestefotos-verwaltung.jpg)
+
+**Gut zu wissen**
+
+- Der Browser verkleinert jedes Foto vor dem Hochladen und speichert es neu. Dabei fallen Aufnahmeort und Kameradaten weg.
+- Jedes Foto wird beim Hochladen per Prüfsumme kontrolliert. Bei schlechtem Netz sendet die Seite bis zu viermal neu, das hilft auf Feiern mit schwachem Empfang.
+- Du entscheidest, wann hochgeladen werden darf: Abschnitte lassen sich einzeln öffnen und schließen. Ohne QR-Code wählt die Fotoseite am Hochzeitstag automatisch den Abschnitt, der gerade dran ist.
+- Die Galerie kannst du für Gäste ausschalten, dann siehst nur du sie in der Verwaltung.
+- Du kannst Fotos in einen anderen Abschnitt verschieben, verbergen oder löschen.
+- Ein passender Absatz in der Datenschutzerklärung ist schon dabei.
+- Die Fotos liegen getrennt von den Daten der Seite in `/data/gaestefotos/<abschnitt>/`.
+
+<details>
+<summary>Weitere Ansichten der Fotofunktion</summary>
+
+![Großansicht der Galerie](docs/screenshots/fotos-leuchtkasten.jpg)
+
+![Hochladen am Handy](docs/screenshots/fotos-upload-handy.jpg)
+
+![Abschnitte, QR-Codes und Galerie in der Verwaltung](docs/screenshots/verwaltung-gaestefotos.jpg)
+
+![Aufsteller zum Ausdrucken](docs/screenshots/aufsteller.png)
+
+</details>
+
+## Verwaltung
 
 ![Verwaltung mit Gästeliste, Sitzplan, To-dos und Kosten](docs/mockup-verwaltung.png)
 
@@ -23,15 +63,15 @@ Eine eigene Hochzeitsseite mit Verwaltung, die du selbst betreibst. Deine Gäste
 
 </details>
 
-Die Bilder zeigen Beispieldaten. Das Design der Gästeseite ist bewusst schlicht gehalten, damit du es leicht an euren Stil anpassen kannst.
+Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefotos sind gezeichnet. Das Design der Gästeseite ist bewusst schlicht gehalten, damit du es leicht an euren Stil anpassen kannst.
 
 ## Was drin ist
 
 **Für die Gäste**
+- **Fotos teilen:** Bilder vom Hochzeitstag per QR-Code hochladen, sortiert nach Abschnitten wie Standesamt, Kirche und Feier, mit gemeinsamer Galerie (siehe oben)
 - Startseite mit Namen, Terminen, Karten-Links und Kalenderdatei (.ics)
 - Zu- und Absage mit Personenzahl, Mitkommenden und Essenswunsch (vegetarisch, vegan)
 - Seiten für Geschichte, Quiz, Kontakt, Impressum und Datenschutz
-- Fotos teilen: Gäste laden während der Hochzeit ihre Bilder hoch, sortiert nach Abschnitten wie Standesamt, Kirche und Feier, mit Galerie
 - Funktioniert auf dem Handy, keine Cookies, keine Fremdanbieter, Schriften liegen lokal
 
 **Für euch (unter `/admin`)**
@@ -41,7 +81,7 @@ Die Bilder zeigen Beispieldaten. Das Design der Gästeseite ist bewusst schlicht
 - To-do-Liste mit Beispiel-Checkliste, die sich nach eurem Hochzeitsdatum richtet
 - Kosten mit Diagramm, Kosten pro Gast und Geschenke
 - Fotos, Geschichte und Quiz pflegen, QR-Code für die Einladung
-- Gästefotos: Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP
+- **Gästefotos:** Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP
 - Zwei bis sechs Zugänge, alle Angaben ohne Programmieren änderbar
 
 ## Schnellstart
