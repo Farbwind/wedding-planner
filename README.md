@@ -82,6 +82,7 @@ Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefoto
 - Kosten mit Diagramm, Kosten pro Gast und Geschenke
 - Fotos, Geschichte und Quiz pflegen, QR-Code für die Einladung
 - **Gästefotos:** Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP
+- Farben der Gästeseite (Haupt-, Hintergrund- und Textfarbe) per Farbwähler ändern, ohne Programmieren
 - Zwei bis sechs Zugänge, alle Angaben ohne Programmieren änderbar
 
 ## Schnellstart
@@ -111,7 +112,7 @@ docker run -d --name hochzeit -p 8080:3000 -v hochzeit-daten:/data \
 
 ## Als Erstes in der Verwaltung
 
-1. Reiter **Angaben**: Namen, Termine, Orte, Kartenlinks, Antwortfrist, Kontakt und Texte eintragen. Ein Foto für den Anfang der Startseite hochladen.
+1. Reiter **Angaben**: Namen, Termine, Orte, Kartenlinks, Antwortfrist, Kontakt und Texte eintragen. Ein Foto für den Anfang der Startseite hochladen. Unter **Farben** die Hauptfarbe passend zu eurer Einladung wählen.
 2. **Impressum und Datenschutz** ausfüllen (Name, Anschrift, E-Mail). Ohne diese Angaben zeigt die Seite „Angaben folgen“.
 3. Reiter **Inhalte**: die Beispiele für Geschichte und Quiz durch eure ersetzen.
 4. Reiter **To-dos**: „Beispiel-To-dos einfügen“ legt eine Checkliste an, deren Fristen sich nach dem Hochzeitsdatum richten.

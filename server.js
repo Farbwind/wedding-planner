@@ -12,7 +12,7 @@ import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -108,6 +108,10 @@ const DEFAULTS = {
   platz_standesamt: '', platz_feier: '',
   // Gästefotos: Galerie auf /fotos für Gäste sichtbar ('1') oder nur in der Verwaltung ('0')
   galerie_gaeste: '1',
+  // Design: Haupt-, Hintergrund- und Textfarbe der Gästeseite als #rrggbb, leer = Standard aus style.css
+  design_akzent: '',
+  design_grund: '',
+  design_text: '',
 };
 const getSettings = () => {
   const s = { ...DEFAULTS };
@@ -596,7 +600,15 @@ async function admin(req, res, url) {
     if (req.method === 'PUT') {
       const b = await readJson(req);
       const up = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
-      for (const k of Object.keys(DEFAULTS)) if (k in b) up.run(k, str(b[k], 1000));
+      const colorPattern = /^#[0-9a-fA-F]{6}$/;
+      for (const k of Object.keys(DEFAULTS)) {
+        if (!(k in b)) continue;
+        if (k.startsWith('design_')) {
+          const v = String(b[k]);
+          if (v && !colorPattern.test(v)) return json(res, 400, { error: 'Bitte eine Farbe im Format #rrggbb angeben.' });
+        }
+        up.run(k, str(b[k], 1000));
+      }
       return json(res, 200, getSettings());
     }
   }

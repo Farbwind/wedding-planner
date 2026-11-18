@@ -26,6 +26,36 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 export function seitenGeruest({ VERSION, PUB, getSettings }) {
   const v = (pfad) => `${pfad}?v=${VERSION}`;
 
+  // Farben aus der Verwaltung (Angaben design_akzent, design_grund, design_text).
+  // Nur gültige Werte im Format #rrggbb kommen ins CSS, alles andere bleibt bei style.css.
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+  const STANDARD = { grund: '#faf9f6', text: '#25282b' };
+  // Mischt zwei Hex-Farben: anteil 0 ergibt a, 1 ergibt b
+  function mischen(a, b, anteil) {
+    const kanal = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+    const wert = (i) => Math.round(kanal(a, i) + (kanal(b, i) - kanal(a, i)) * anteil).toString(16).padStart(2, '0');
+    return `#${wert(0)}${wert(1)}${wert(2)}`;
+  }
+  function designCss() {
+    const s = getSettings();
+    const akzent = HEX.test(s.design_akzent) ? s.design_akzent.toLowerCase() : '';
+    const grund = HEX.test(s.design_grund) ? s.design_grund.toLowerCase() : '';
+    const text = HEX.test(s.design_text) ? s.design_text.toLowerCase() : '';
+    const zeilen = [];
+    if (akzent) {
+      zeilen.push(`--farbe-akzent: ${akzent}`, `--farbe-akzent-dunkel: ${mischen(akzent, '#000000', 0.25)}`, `--farbe-akzent-hell: ${mischen(akzent, '#ffffff', 0.88)}`);
+    }
+    // Abgeleitete Farben folgen Hintergrund und Text, damit Bänder, Linien und Nebentexte dazu passen
+    const grundWirksam = grund || STANDARD.grund;
+    const textWirksam = text || STANDARD.text;
+    if (grund) {
+      zeilen.push(`--farbe-grund: ${grund}`, `--farbe-band: ${mischen(grund, textWirksam, 0.06)}`, `--farbe-linie: ${mischen(grund, textWirksam, 0.12)}`);
+    }
+    if (text) zeilen.push(`--farbe-text: ${text}`);
+    if (text || grund) zeilen.push(`--farbe-text-weich: ${mischen(textWirksam, grundWirksam, 0.3)}`);
+    return zeilen.length ? `<style>:root { ${zeilen.join('; ')}; }</style>` : '';
+  }
+
   // „Anna & Ben“ oder „Anna und Ben“ in zwei Namen zerlegen
   function paar() {
     const voll = getSettings().couple || '';
@@ -50,6 +80,7 @@ export function seitenGeruest({ VERSION, PUB, getSettings }) {
 <link rel="icon" href="/img/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${v('/style.css')}">
+${designCss()}
 </head>
 <body class="seite-${name}">
 ${SYMBOLE}

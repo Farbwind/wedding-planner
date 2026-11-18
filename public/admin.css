@@ -40,6 +40,7 @@ input, select, textarea {
 }
 input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--ja); outline-offset: 0; border-color: var(--ja); }
 input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--ja); margin: 0; }
+input[type="color"] { height: 44px; padding: 4px; cursor: pointer; }
 label { font-weight: 600; font-size: .92rem; }
 .hilfe { color: var(--tinte-weich); margin: 0; font-size: .92rem; }
 .fehler { color: var(--nein); font-weight: 600; margin: 0; }

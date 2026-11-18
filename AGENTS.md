@@ -19,7 +19,7 @@ Danach `http://localhost:8080` (Gäste) und `http://localhost:8080/admin` (Verwa
 | `inhalte.js` | Fotos, Geschichte, Quiz (Sammlungen) und Sitzplan, dazu Beispielinhalte beim ersten Start |
 | `planung.js` | Gästeliste, Einladungskarten, To-dos (mit Beispiel-Checkliste), Kosten, Geschenke |
 | `gaestefotos.js` | Fotos der Gäste: Abschnitte, Upload (`POST /api/gaestefotos`), Galerie, ZIP-Download, QR-Codes und Druckvorlage. Ablage in `/data/gaestefotos/<abschnitt>/` |
-| `public/style.css` | Gesamtes Aussehen der Gästeseiten. Farben, Schriften und Rundungen stehen oben unter `:root` |
+| `public/style.css` | Gesamtes Aussehen der Gästeseiten. Farben, Schriften und Rundungen stehen oben unter `:root`. Drei Farben kann die Verwaltung überschreiben (Schlüssel `design_akzent`, `design_grund`, `design_text` in den Angaben): `seiten.js` gibt sie als `<style>` direkt nach `style.css` aus und leitet Abstufungen ab. Die Standardwerte in `style.css` und in `public/admin.js` (`FARBEN`) müssen übereinstimmen |
 | `public/seiten/*.html` | Inhalt der Gästeseiten (ohne Kopf und Fuß). Startseite: `start.html` |
 | `public/app.js` | Logik der Startseite: lädt `/api/info`, füllt die Felder, steuert das Antwortformular |
 | `public/js/*.js` | Skripte der Unterseiten (`geschichte.js`, `quiz.js`, `kontakt.js`), `basis.js` (Menü, Hilfen) und die Skripte der Verwaltung (`admin-*.js`) |
