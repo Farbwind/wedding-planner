@@ -11,8 +11,9 @@ import { inhalte } from './inhalte.js';
 import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
+import { ablauf } from './ablauf.js';
 
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -59,6 +60,10 @@ if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = 'toke
 for (const spalte of ['vegetarian', 'vegan'])
   if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = ?").get(spalte))
     db.exec(`ALTER TABLE responses ADD COLUMN ${spalte} INTEGER NOT NULL DEFAULT 0`);
+// Songwunsch und Beitrag der Gäste (seit 1.5.0), freiwillig
+for (const spalte of ['song', 'beitrag'])
+  if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = ?").get(spalte))
+    db.exec(`ALTER TABLE responses ADD COLUMN ${spalte} TEXT NOT NULL DEFAULT ''`);
 for (const u of USERS) db.prepare('INSERT OR IGNORE INTO users (name, pw) VALUES (?, NULL)').run(u);
 // Erstes Passwort per Umgebungsvariable ADMIN_PASSWORD (mindestens 8 Zeichen), nur für Zugänge ohne Passwort.
 // Praktisch, wenn der Server im Internet steht und das Passwort nicht im Heimnetz gesetzt werden kann.
@@ -110,6 +115,9 @@ const DEFAULTS = {
   galerie_gaeste: '1',
   // Wer die Fotoseite nutzen darf: 'offen' (jeder mit dem Link) oder 'qr' (nur mit dem Schlüssel aus den gedruckten QR-Codes)
   galerie_zugang: 'offen',
+  // Zusage: Felder für Songwunsch und Beitrag (Rede, Lied, Spiel) anzeigen ('1') oder nicht ('0')
+  zusage_song: '1',
+  zusage_beitrag: '1',
   // Design: Haupt-, Hintergrund- und Textfarbe der Gästeseite als #rrggbb, leer = Standard aus style.css
   design_akzent: '',
   design_grund: '',
@@ -421,6 +429,8 @@ function publicInfo(code) {
     maxPersons: invite ? invite.max_persons : int(s.max_persons_open, 1, 20),
     hasPhoto: fs.existsSync(path.join(DATA, 'foto.jpg')),
     fotos: db.prepare('SELECT bild, text FROM fotos ORDER BY sort, id').all(),
+    zusageSong: s.zusage_song !== '0',
+    zusageBeitrag: s.zusage_beitrag !== '0',
     infoDresscode: s.info_dresscode,
     infoSpiele: s.info_spiele,
     trauzeugen: [1, 2].map((i) => ({ name: s[`tz${i}_name`], rolle: s[`tz${i}_rolle`], tel: s[`tz${i}_tel`], mail: s[`tz${i}_mail`] })).filter((t) => t.name),
@@ -432,7 +442,7 @@ function publicInfo(code) {
 }
 const pubResponse = (r) => ({
   name: r.name, attending: !!r.attending, persons: r.persons, civil: !!r.civil,
-  companions: r.companions, diet: r.diet, vegetarian: !!r.vegetarian, vegan: !!r.vegan, message: r.message, updated_at: r.updated_at,
+  companions: r.companions, diet: r.diet, vegetarian: !!r.vegetarian, vegan: !!r.vegan, song: r.song || '', beitrag: r.beitrag || '', message: r.message, updated_at: r.updated_at,
 });
 
 async function handleRsvp(req, res) {
@@ -459,6 +469,8 @@ async function handleRsvp(req, res) {
     diet: '', // Feld für Allergien gibt es seit 4.6.5 nicht mehr
     vegetarian: b.attending && b.vegetarian ? 1 : 0,
     vegan: b.attending && b.vegan ? 1 : 0,
+    song: b.attending && s.zusage_song !== '0' ? str(b.song, 200) : '',
+    beitrag: b.attending && s.zusage_beitrag !== '0' ? str(b.beitrag, 400) : '',
     message: str(b.message, 1500),
   };
   let id;
@@ -467,13 +479,13 @@ async function handleRsvp(req, res) {
     ? db.prepare('SELECT id, token FROM responses WHERE invite_id = ?').get(inv.id)
     : token ? db.prepare('SELECT id, token FROM responses WHERE invite_id IS NULL AND token = ?').get(token) : null;
   if (existing) {
-    db.prepare(`UPDATE responses SET name=?, attending=?, persons=?, civil=?, companions=?, diet=?, vegetarian=?, vegan=?, message=?, updated_at=? WHERE id=?`)
-      .run(row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.message, now(), existing.id);
+    db.prepare(`UPDATE responses SET name=?, attending=?, persons=?, civil=?, companions=?, diet=?, vegetarian=?, vegan=?, song=?, beitrag=?, message=?, updated_at=? WHERE id=?`)
+      .run(row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.song, row.beitrag, row.message, now(), existing.id);
     id = existing.id;
   } else {
-    const r = db.prepare(`INSERT INTO responses (invite_id, name, attending, persons, civil, companions, diet, vegetarian, vegan, message, created_at, updated_at, token)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(inv?.id ?? null, row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.message, now(), now(), crypto.randomBytes(18).toString('hex'));
+    const r = db.prepare(`INSERT INTO responses (invite_id, name, attending, persons, civil, companions, diet, vegetarian, vegan, song, beitrag, message, created_at, updated_at, token)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(inv?.id ?? null, row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.song, row.beitrag, row.message, now(), now(), crypto.randomBytes(18).toString('hex'));
     id = Number(r.lastInsertRowid);
   }
   const saved = db.prepare('SELECT * FROM responses WHERE id = ?').get(id);
@@ -509,6 +521,12 @@ function overview() {
     responses,
     publicUrl: PUBLIC_URL,
   };
+}
+
+// Songwünsche und Beiträge aller Zusagen als Tabelle (für DJ und Moderation)
+function exportSongsCsv() {
+  const zeilen = db.prepare("SELECT name, song, beitrag FROM responses WHERE attending = 1 AND (song != '' OR beitrag != '') ORDER BY name COLLATE NOCASE").all();
+  return '\ufeff' + [['Name', 'Songwunsch', 'Beitrag'], ...zeilen.map((r) => [r.name, r.song, r.beitrag])].map((z) => z.map(csvCell).join(';')).join('\r\n');
 }
 
 const inviteUrl = (code) => `${PUBLIC_URL}/p/${code}`;
@@ -692,6 +710,7 @@ async function admin(req, res, url) {
     return send(res, 200, await QRCode.toBuffer(target, { ...QR_OPTS, width: 1200 }), 'image/png', dl);
   }
   if (p === '/api/admin/export.csv') return send(res, 200, exportCsv(), 'text/csv; charset=utf-8', { 'Content-Disposition': 'attachment; filename="hochzeit-antworten.csv"' });
+  if (p === '/api/admin/songs.csv') return send(res, 200, exportSongsCsv(), 'text/csv; charset=utf-8', { 'Content-Disposition': 'attachment; filename="hochzeit-songs-und-beitraege.csv"' });
   if (p === '/api/admin/paesse.csv') return send(res, 200, exportInvitesCsv(), 'text/csv; charset=utf-8', { 'Content-Disposition': 'attachment; filename="hochzeit-paesse.csv"' });
   if (p === '/api/admin/qr-bogen') return send(res, 200, await qrSheet(), 'text/html; charset=utf-8');
   return json(res, 404, { error: 'Nicht gefunden.' });
@@ -701,6 +720,7 @@ const geruest = seitenGeruest({ VERSION, PUB, getSettings });
 const behandleInhalte = inhalte({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, gruppenAusListe: () => behandlePlanung.gruppenJeAntwort() });
 const behandlePlanung = planung({ db, json, send, str, int, sessionUser, getSettings });
 const behandleFotos = gaestefotos({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, getSettings, PUBLIC_URL });
+const behandleAblauf = ablauf({ db, send, json, str, int, sessionUser, limited, clientIp, getSettings, overview, sitzplanDaten: () => behandleInhalte.sitzplanDaten(), PUBLIC_URL });
 const UNTERSEITEN = ['geschichte', 'quiz', 'fotos', 'kontakt'];
 
 const server = http.createServer(async (req, res) => {
@@ -719,6 +739,7 @@ const server = http.createServer(async (req, res) => {
     if (await behandleInhalte(req, res, url)) return;
     if (await behandlePlanung(req, res, url)) return;
     if (await behandleFotos(req, res, url)) return;
+    if (await behandleAblauf(req, res, url)) return;
     if (p.startsWith('/api/admin/')) return await admin(req, res, url);
     if (p === '/kalender.ics') {
       const welche = ['standesamt', 'hochzeit'].includes(url.searchParams.get('termin')) ? url.searchParams.get('termin') : 'alle';

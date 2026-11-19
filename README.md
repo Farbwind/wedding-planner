@@ -82,6 +82,8 @@ Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefoto
 - To-do-Liste mit Beispiel-Checkliste, die sich nach eurem Hochzeitsdatum richtet
 - Kosten mit Diagramm, Kosten pro Gast und Geschenke
 - Fotos, Geschichte und Quiz pflegen, QR-Code für die Einladung
+- **Ablauf und Dienstleister:** Programm des Tages mit Uhrzeit, Ort und Zuständigen pflegen, interne Punkte bleiben unter euch. Pro Dienstleister (Catering, DJ, Location, Fotografie) ein eigener Link, der nur zeigt, was ihr freigebt: Ablauf, Gästezahlen und Essenswünsche, Songwünsche, Sitzplan. Nur lesbar, immer aktuell, jederzeit sperrbar oder erneuerbar
+- **Songwünsche und Beiträge:** Gäste können bei der Zusage einen Song wünschen und anmelden, dass sie etwas beitragen möchten. Beides als Liste einsehbar und als Tabelle ladbar, in den Angaben abschaltbar
 - **Gästefotos:** Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP
 - Farben der Gästeseite (Haupt-, Hintergrund- und Textfarbe) per Farbwähler ändern, ohne Programmieren
 - Zwei bis sechs Zugänge, alle Angaben ohne Programmieren änderbar

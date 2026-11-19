@@ -100,12 +100,15 @@ function antworten() {
       if (filter === 'ja' && !r.attending) continue;
       if (filter === 'nein' && r.attending) continue;
       if (filter === 'essen' && !(r.attending && (r.vegetarian || r.vegan))) continue;
+      if (filter === 'wuensche' && !(r.attending && (r.song || r.beitrag))) continue;
       if (!passt(r.name) && !passt(r.invite_name) && !passt(r.companions)) continue;
       const details = [
         r.civil ? '<p><b>Standesamt:</b> ja</p>' : '',
         r.companions ? `<p><b>Mitreisende:</b> ${esc(r.companions)}</p>` : '',
         r.attending && (r.vegetarian || r.vegan) ? `<p class="essen">${r.vegetarian ? '<span class="marke gruen">Vegetarisch</span>' : ''}${r.vegan ? '<span class="marke gruen">Vegan</span>' : ''}</p>` : '',
         r.diet ? `<p><b>Allergien/Wünsche:</b> ${esc(r.diet)}</p>` : '',
+        r.song ? `<p><b>Songwunsch:</b> ${esc(r.song)}</p>` : '',
+        r.beitrag ? `<p><b>Beitrag:</b> ${esc(r.beitrag)}</p>` : '',
         r.message ? `<p><b>Nachricht:</b> ${esc(r.message)}</p>` : '',
       ].join('');
       zeilen.push(`<article class="zeile">

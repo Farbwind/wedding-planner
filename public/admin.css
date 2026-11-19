@@ -517,3 +517,33 @@ body.zieht, body.zieht * { cursor: grabbing !important; user-select: none; }
   .gf-abschnitt-felder { grid-template-columns: 1fr; }
   .gf-abschnitt-knoepfe { grid-column: 1 / -1; }
 }
+
+/* Ablauf und Links für Dienstleister */
+.ab-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.ab-form label { display: grid; gap: 6px; }
+.ab-form .ganz { grid-column: 1 / -1; }
+.ab-form .haken { display: flex; }
+.ab-form .fehler, .ab-form .reihe { grid-column: 1 / -1; }
+.ab-tag { margin: 22px 0 8px; font-size: 1rem; }
+.ab-zeile { display: grid; grid-template-columns: 64px 1fr auto auto; gap: 8px 14px; align-items: start; padding: 12px 16px; background: #fff; }
+.ab-zeile.intern { background: #f6f5f0; }
+.ab-zeit { font-variant-numeric: tabular-nums; color: var(--einband); }
+.ab-text span { color: var(--tinte-weich); font-size: .92rem; }
+.ab-text p { margin: 2px 0 0; color: var(--tinte-weich); font-size: .92rem; }
+.ab-marken { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.ab-knoepfe, .dl-knoepfe { display: flex; gap: 6px; flex-wrap: wrap; }
+.dl-form { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); align-items: end; }
+.dl-form label { display: grid; gap: 6px; }
+.dl-form .haken { display: flex; padding-bottom: 10px; }
+.dl-form .fehler { grid-column: 1 / -1; }
+.dl-liste { display: grid; gap: 10px; }
+.dl-karte { display: grid; gap: 8px; padding: 14px 16px; background: #fff; border-radius: 10px; box-shadow: 0 0 0 1px var(--linie); }
+.dl-karte.aus { opacity: .6; }
+.dl-kopf { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: baseline; }
+.dl-url { font: .88rem ui-monospace, Menlo, monospace; }
+@media (max-width: 640px) {
+  .ab-form { grid-template-columns: 1fr; }
+  .ab-zeile { grid-template-columns: 56px 1fr; }
+  .ab-marken { justify-content: flex-start; grid-column: 2; }
+  .ab-knoepfe { grid-column: 2; }
+}

@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT N
   const csvZelle = (v) => { const s = String(v ?? ''); return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
 
 
-  return async function behandle(req, res, url) {
+  async function behandle(req, res, url) {
     const p = url.pathname;
     const m = req.method;
     let t;
@@ -318,5 +318,8 @@ CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT N
       return true;
     }
     return false;
-  };
+  }
+  // Für Seiten, die den Sitzplan nur lesen (Dienstleister-Link)
+  behandle.sitzplanDaten = () => ({ gaeste: gaeste(), tische: db.prepare('SELECT * FROM tische ORDER BY sort, id').all() });
+  return behandle;
 }

@@ -33,6 +33,7 @@
     <nav class="reiter" aria-label="Bereiche">
       <button type="button" data-reiter="gaesteliste" aria-current="page">Gästeliste</button>
       <button type="button" data-reiter="sitzplan">Sitzplan</button>
+      <button type="button" data-reiter="ablauf">Ablauf</button>
       <button type="button" data-reiter="todos">To-dos <span class="zaehler-marke" id="todo-marke" hidden></span></button>
       <button type="button" data-reiter="kosten">Kosten</button>
       <button type="button" data-reiter="inhalte">Inhalte</button>
@@ -124,9 +125,11 @@
           <button type="button" data-filter="ja" aria-pressed="false">Zusagen</button>
           <button type="button" data-filter="nein" aria-pressed="false">Absagen</button>
           <button type="button" data-filter="essen" aria-pressed="false">Vegetarisch/Vegan</button>
+          <button type="button" data-filter="wuensche" aria-pressed="false">Songs und Beiträge</button>
         </div>
         <input type="search" id="suche" placeholder="Name suchen" aria-label="Antwort suchen">
         <a class="knopf leise" href="/api/admin/export.csv">Als Tabelle laden</a>
+        <a class="knopf leise" href="/api/admin/songs.csv">Songs und Beiträge laden</a>
       </div>
       <div class="liste" id="antworten-liste"></div>
     </section>
@@ -274,6 +277,44 @@
       <div id="inhalt-liste" class="inhalt-liste"></div>
     </section>
 
+    <section data-bereich="ablauf" hidden>
+      <div class="leiste">
+        <p class="leiste-text" id="ab-stand"></p>
+        <button type="button" class="knopf leise" id="ab-beispiel" hidden title="Fügt einen typischen Ablauf ein, den ihr danach anpasst">Beispielablauf einfügen</button>
+      </div>
+      <details class="block neu-block" id="ab-neu">
+        <summary id="ab-form-titel">Programmpunkt hinzufügen</summary>
+        <form id="ab-form" class="ab-form" novalidate>
+          <input type="hidden" name="id">
+          <label>Datum<input name="tag" type="date"></label>
+          <label>Uhrzeit<input name="zeit" type="time"></label>
+          <label class="ganz">Was passiert?<input name="titel" maxlength="120" placeholder="z. B. Sektempfang"></label>
+          <label>Wo<input name="ort" maxlength="120"></label>
+          <label>Zuständig<input name="wer" maxlength="80" list="ab-wer" placeholder="z. B. Catering"></label>
+          <datalist id="ab-wer"><option value="Catering"><option value="DJ"><option value="Fotografie"><option value="Location"><option value="Trauzeugen"></datalist>
+          <label class="ganz">Notiz<input name="notiz" maxlength="500" placeholder="z. B. Sektgläser bitte vorher kühlen"></label>
+          <label class="haken ganz"><input type="checkbox" name="intern"> Nur intern (Dienstleister sehen diesen Punkt nicht)</label>
+          <p class="fehler" id="ab-fehler" role="alert" hidden></p>
+          <div class="reihe"><button class="knopf" id="ab-speichern">Hinzufügen</button><button type="button" class="knopf leise" id="ab-abbrechen" hidden>Abbrechen</button></div>
+        </form>
+      </details>
+      <div id="ab-liste"></div>
+
+      <h2 class="bereich-titel">Links für Dienstleister</h2>
+      <p class="hilfe">Jeder Dienstleister bekommt einen eigenen Link und sieht nur, was ihr freigebt. Die Seite ist nur lesbar und aktualisiert sich von selbst, ihr müsst also nichts nachschicken. Wer den Link hat, sieht den Inhalt: gebt ihn nur den Beteiligten und erneuert ihn, wenn er in falsche Hände geraten ist.</p>
+      <form id="dl-form" class="block breit dl-form" novalidate>
+        <label>Für wen?<input name="name" maxlength="60" list="dl-namen" placeholder="z. B. Catering"></label>
+        <datalist id="dl-namen"><option value="Catering"><option value="DJ"><option value="Location"><option value="Fotografie"></datalist>
+        <label class="haken"><input type="checkbox" name="ablauf" checked> Ablauf</label>
+        <label class="haken"><input type="checkbox" name="zahlen"> Gästezahlen und Essenswünsche</label>
+        <label class="haken"><input type="checkbox" name="songs"> Songwünsche</label>
+        <label>Sitzplan<select name="sitzplan"><option value="0">nicht zeigen</option><option value="1">Tische mit Anzahl</option><option value="2">Tische mit Namen</option></select></label>
+        <button class="knopf">Link anlegen</button>
+        <p class="fehler" id="dl-fehler" role="alert" hidden></p>
+      </form>
+      <div id="dl-liste" class="dl-liste"></div>
+    </section>
+
     <section data-bereich="gaestefotos" hidden>
       <div class="leiste">
         <div class="filter" role="group" aria-label="Abschnitt filtern" id="gf-filter"></div>
@@ -389,6 +430,8 @@
         <div class="raster">
           <label>Kontakt bei Fragen<input name="contact" placeholder="Anna: 0170 …"></label>
           <label>Höchstzahl Personen pro Antwort<input name="max_persons_open" type="number" min="1" max="20"></label>
+          <label>Feld „Songwunsch“ in der Zusage<select name="zusage_song"><option value="1">Anzeigen</option><option value="0">Ausblenden</option></select></label>
+          <label>Feld „Beitrag“ in der Zusage (Rede, Lied, Spiel)<select name="zusage_beitrag"><option value="1">Anzeigen</option><option value="0">Ausblenden</option></select></label>
         </div>
         <h3>Impressum und Datenschutz</h3>
         <div class="raster">
@@ -431,5 +474,6 @@
 <script src="/js/admin-sitzplan.js" type="module"></script>
 <script src="/js/admin-planung.js" type="module"></script>
 <script src="/js/admin-fotos.js" type="module"></script>
+<script src="/js/admin-ablauf.js" type="module"></script>
 </body>
 </html>

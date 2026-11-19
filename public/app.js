@@ -105,6 +105,8 @@ function wahlZeigen() {
   const ja = formular.attending.value !== 'nein';
   document.querySelectorAll('.nur-ja').forEach((el) => (el.hidden = !ja));
   feld('mitreisende-feld').hidden = !ja || personen < 2;
+  feld('song-feld').hidden = !ja || !info.zusageSong;
+  feld('beitrag-feld').hidden = !ja || !info.zusageBeitrag;
   // Bei nur einem Platz braucht es keinen Zähler
   document.querySelector('.zaehler').closest('.feld').hidden = !ja || maxPersonen === 1;
   setze('absenden', formular.attending.value === 'nein' ? 'Absage senden' : 'Zusage senden');
@@ -117,6 +119,8 @@ function formularFuellen(r) {
   formular.companions.value = r.companions || '';
   formular.vegetarian.checked = !!r.vegetarian;
   formular.vegan.checked = !!r.vegan;
+  formular.song.value = r.song || '';
+  formular.beitrag.value = r.beitrag || '';
   formular.message.value = r.message || '';
   zaehlerZeigen();
   wahlZeigen();
@@ -129,6 +133,7 @@ function bestaetigungZeigen(r, druckt) {
         ['Personen', r.persons],
         ['Datum', langesDatum(info.church.date)],
         r.vegetarian || r.vegan ? ['Essen', [r.vegetarian && 'Vegetarisch', r.vegan && 'Vegan'].filter(Boolean).join(', ')] : null,
+        r.song ? ['Songwunsch', r.song] : null,
       ]
     : [['Name', r.name], ['Antwort', 'Absage']];
   feld('karte').innerHTML = `<dl>${zeilen.filter(Boolean).map(([k, w]) => `<div><dt>${esc(k)}</dt><dd>${esc(w)}</dd></div>`).join('')}</dl>`;
@@ -182,6 +187,8 @@ formular.addEventListener('submit', async (e) => {
         companions: formular.companions.value,
         vegetarian: formular.vegetarian.checked,
         vegan: formular.vegan.checked,
+        song: formular.song.value,
+        beitrag: formular.beitrag.value,
         message: formular.message.value,
         website: formular.website.value,
       }),
