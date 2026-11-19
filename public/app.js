@@ -20,6 +20,8 @@ let wir = true;
 let tokenGast = '';
 
 const tag = (iso, opts) => new Date(`${iso}T12:00:00`).toLocaleDateString('de-DE', opts);
+const tagZahl = (iso) => String(new Date(`${iso}T12:00:00`).getDate());
+const monatName = (iso) => tag(iso, { month: 'long' });
 const langesDatum = (iso) => tag(iso, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const fristDatum = (iso) => tag(iso, { day: 'numeric', month: 'long', year: 'numeric' });
 // „Uhr“ nur an echte Uhrzeiten hängen, Text wie „im Anschluss“ bleibt wie er ist
@@ -35,9 +37,13 @@ function seiteFuellen() {
 
   const [n1, n2] = i.couple.split(/\s*&\s*|\s+und\s+/);
   if (n1 && n2) { setze('name1', n1.trim()); setze('name2', n2.trim()); }
-  if (i.hasPhoto) { feld('foto').src = '/foto'; feld('foto-rahmen').hidden = false; document.getElementById('start').classList.add('mit-foto'); }
+  if (i.hasPhoto) { feld('foto').src = '/foto'; feld('foto-rahmen').hidden = false; feld('hero-inhalt').classList.add('mit-foto'); }
 
   setze('hero-datum', langesDatum(i.church.date));
+  setze('hero-ort', [i.church.place, i.party.place].filter(Boolean).filter((o, n, a) => a.indexOf(o) === n).join(' · '));
+  siegelFuellen(i, n1 && n2 ? `${n1.trim()} & ${n2.trim()}` : i.couple);
+  lichtpunkte();
+  countdownStarten(i);
   setze('willkommen', i.welcome);
   if (i.invite) {
     const g = setze('gruss', `${i.invite.name}, wir freuen uns, wenn ${wir ? 'ihr dabei seid' : 'du dabei bist'}.`);
@@ -55,6 +61,8 @@ function seiteFuellen() {
   } else {
     feld('etappe1').hidden = true;
   }
+  if (i.civil) { setze('e1-tag', tagZahl(i.civil.date)); setze('e1-monat', monatName(i.civil.date)); }
+  for (const n of ['e2', 'e3']) { setze(`${n}-tag`, tagZahl(i.church.date)); setze(`${n}-monat`, monatName(i.church.date)); }
   setze('e2-datum', langesDatum(i.church.date));
   setze('e3-datum', langesDatum(i.church.date));
   setze('kirche-zeit', uhr(i.church.time) || 'Uhrzeit folgt');
@@ -92,6 +100,68 @@ function seiteFuellen() {
   if (i.invite && maxPersonen > 1) personen = maxPersonen;
   zaehlerZeigen();
   wahlZeigen();
+}
+
+// Drehendes Siegel am Foto: Text auf dem Kreis, Datum aus den Angaben
+function siegelFuellen(i, namen) {
+  const el = feld('siegel-text');
+  if (!el) return;
+  const teile = [`${namen}`, tag(i.church.date, { day: 'numeric', month: 'long', year: 'numeric' }), 'Wir heiraten'];
+  el.textContent = `${teile.join(' · ')} · `;
+}
+
+// Ein paar warme Lichtpunkte, die langsam im Hintergrund aufsteigen (nur CSS, ruht bei reduzierter Bewegung)
+function lichtpunkte() {
+  const box = feld('licht');
+  if (!box || box.childElementCount || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  box.innerHTML = Array.from({ length: 14 }, (_, n) => {
+    const s = 10 + ((n * 37) % 38);
+    return `<i style="--x:${(n * 7.3 + 4) % 96}%;--s:${s}px;--d:${-((n * 2.7) % 18).toFixed(1)}s;--t:${(14 + (n * 1.9) % 10).toFixed(1)}s;--dx:${((n % 5) - 2) * 40}px"></i>`;
+  }).join('');
+}
+
+// Countdown bis zur Trauung, springt am Tag selbst auf „Heute ist es so weit“
+function countdownStarten(i) {
+  const band = feld('countdown');
+  if (!band || !i.church.date) return;
+  const zeit = (i.church.time || '').match(/(\d{1,2})[:.](\d{2})/);
+  const ziel = new Date(`${i.church.date}T${zeit ? `${zeit[1].padStart(2, '0')}:${zeit[2]}` : '14:00'}:00`);
+  const zwei = (n) => String(n).padStart(2, '0');
+  const tick = () => {
+    const rest = ziel - Date.now();
+    band.hidden = false;
+    if (rest <= 0) {
+      const heute = new Date().toDateString() === ziel.toDateString();
+      feld('cd-zahlen').hidden = true;
+      feld('cd-vor').hidden = true;
+      const satz = feld('cd-satz');
+      satz.hidden = false;
+      satz.textContent = heute ? 'Heute ist es so weit.' : `Wir sind verheiratet. Danke, dass ${wir ? 'ihr dabei wart' : 'du dabei warst'}.`;
+      return false;
+    }
+    feld('cd-tage').textContent = Math.floor(rest / 864e5);
+    feld('cd-std').textContent = zwei(Math.floor(rest / 36e5) % 24);
+    feld('cd-min').textContent = zwei(Math.floor(rest / 6e4) % 60);
+    feld('cd-sek').textContent = zwei(Math.floor(rest / 1e3) % 60);
+    return true;
+  };
+  if (!tick()) return;
+  const lauf = setInterval(() => { if (!tick()) clearInterval(lauf); }, 1000);
+}
+
+// Konfetti nach der Zusage
+function konfetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const farben = ['#b88a45', '#f4e3bf', '#ffffff', 'var(--farbe-akzent-hell)', '#d9b36a'];
+  const box = document.createElement('div');
+  box.className = 'konfetti';
+  box.setAttribute('aria-hidden', 'true');
+  box.innerHTML = Array.from({ length: 70 }, (_, n) => {
+    const w = 6 + (n % 5) * 2;
+    return `<i style="--x:${(n * 13.7) % 100}%;--w:${w}px;--h:${w * (n % 3 ? 1.6 : 1)}px;--f:${farben[n % farben.length]};--d:${((n * 0.037) % 0.9).toFixed(2)}s;--t:${(2.4 + (n % 7) * 0.3).toFixed(1)}s;--dx:${((n % 9) - 4) * 28}px;--r:${(n * 47) % 360}deg"></i>`;
+  }).join('');
+  document.body.append(box);
+  setTimeout(() => box.remove(), 5200);
 }
 
 function zaehlerZeigen() {
@@ -201,6 +271,7 @@ formular.addEventListener('submit', async (e) => {
     }
     info.response = data.response;
     bestaetigungZeigen(data.response, true);
+    if (data.response.attending) konfetti();
     document.getElementById('buchen').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   } catch {
     fehlerZeigen('Keine Verbindung. Bitte prüft das Internet und versucht es noch einmal.');

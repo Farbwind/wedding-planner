@@ -1,10 +1,13 @@
 <main>
   <!-- Anfang: Namen, Datum, Foto. Texte kommen aus der Verwaltung (Reiter „Angaben“), siehe public/app.js -->
   <section class="hero" id="start" aria-labelledby="titel">
+    <div class="hero-licht" data-feld="licht" aria-hidden="true"></div>
+    <div class="hero-inhalt" data-feld="hero-inhalt">
     <div class="hero-text">
       <p class="hero-vorspann">Wir heiraten</p>
-      <h1 id="titel" class="namen"><span data-feld="name1">Anna</span> <span class="und">&amp;</span> <span data-feld="name2">Ben</span></h1>
+      <h1 id="titel" class="namen"><span class="name" data-feld="name1">Anna</span><span class="zeile"><span class="und">&amp;</span><span class="name" data-feld="name2">Ben</span></span></h1>
       <p class="hero-datum" data-feld="hero-datum"></p>
+      <p class="hero-ort" data-feld="hero-ort"></p>
       <p class="gruss" data-feld="gruss" hidden></p>
       <p class="willkommen" data-feld="willkommen"></p>
       <div class="hero-knoepfe">
@@ -15,15 +18,32 @@
     </div>
     <figure class="hero-bild" data-feld="foto-rahmen" hidden>
       <img data-feld="foto" alt="Foto vom Brautpaar" fetchpriority="high">
+      <div class="hero-siegel" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><defs><path id="siegel-kreis" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs><text><textPath href="#siegel-kreis" data-feld="siegel-text" textLength="288" lengthAdjust="spacing">Wir heiraten · Wir heiraten · </textPath></text></svg>
+        <svg class="herz" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" fill="currentColor"/></svg>
+      </div>
     </figure>
+    </div>
+  </section>
+
+  <section class="countdown" aria-label="Countdown bis zur Hochzeit" data-feld="countdown" hidden>
+    <p class="countdown-vor" data-feld="cd-vor">Noch</p>
+    <div class="countdown-zahlen" data-feld="cd-zahlen">
+      <div><b data-feld="cd-tage">0</b><span>Tage</span></div>
+      <div><b data-feld="cd-std">00</b><span>Stunden</span></div>
+      <div><b data-feld="cd-min">00</b><span>Minuten</span></div>
+      <div><b data-feld="cd-sek">00</b><span>Sekunden</span></div>
+    </div>
+    <p class="countdown-satz" data-feld="cd-satz" hidden></p>
   </section>
 
   <section class="termine" id="termine" aria-labelledby="termine-titel">
     <h2 id="termine-titel">Termine</h2>
     <ol class="termin-liste">
       <li class="termin" data-feld="etappe1">
-        <p class="termin-datum" data-feld="e1-datum"></p>
+        <div class="termin-kopf" aria-hidden="true"><span class="termin-tag" data-feld="e1-tag"></span><span class="termin-monat" data-feld="e1-monat"></span></div>
         <h3>Standesamt</h3>
+        <p class="termin-datum" data-feld="e1-datum"></p>
         <p class="termin-zeit" data-feld="e1-zeit"></p>
         <p class="termin-ort"><strong data-feld="e1-titel"></strong><br><span data-feld="e1-adresse"></span></p>
         <p class="termin-notiz" data-feld="e1-notiz"></p>
@@ -33,8 +53,9 @@
         </div>
       </li>
       <li class="termin">
-        <p class="termin-datum" data-feld="e2-datum"></p>
+        <div class="termin-kopf" aria-hidden="true"><span class="termin-tag" data-feld="e2-tag"></span><span class="termin-monat" data-feld="e2-monat"></span></div>
         <h3>Kirche</h3>
+        <p class="termin-datum" data-feld="e2-datum"></p>
         <p class="termin-zeit" data-feld="kirche-zeit"></p>
         <p class="termin-ort"><strong data-feld="kirche-ort"></strong><br><span data-feld="kirche-adresse"></span></p>
         <div class="termin-links">
@@ -43,8 +64,9 @@
         </div>
       </li>
       <li class="termin">
-        <p class="termin-datum" data-feld="e3-datum"></p>
+        <div class="termin-kopf" aria-hidden="true"><span class="termin-tag" data-feld="e3-tag"></span><span class="termin-monat" data-feld="e3-monat"></span></div>
         <h3>Feier</h3>
+        <p class="termin-datum" data-feld="e3-datum"></p>
         <p class="termin-zeit" data-feld="feier-zeit"></p>
         <p class="termin-ort"><strong data-feld="feier-ort"></strong><br><span data-feld="feier-adresse"></span></p>
         <p class="termin-notiz" data-feld="feier-notiz"></p>

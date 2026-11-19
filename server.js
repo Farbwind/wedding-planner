@@ -13,7 +13,7 @@ import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 import { ablauf } from './ablauf.js';
 
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
