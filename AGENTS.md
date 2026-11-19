@@ -51,6 +51,7 @@ Namen, Termine, Orte, Texte, Kontakt, Impressum stehen in der Tabelle `settings`
 
 - Tabellen: `settings`, `responses` (Antworten), `invites` (optionale persönliche Einladungslinks `/p/CODE`), `einladung` (Gästeliste), `todos`, `kosten`, `geschenke`, `geschichte`, `quiz`, `fotos`, `tische`, `sitz`, `gast_info`, `gaeste_extra`, `foto_abschnitte`, `gaestefotos`, `users`, `sessions`
 - Fotoseite: Einstellung `galerie_zugang` (`offen` oder `qr`). Bei `qr` brauchen Liste, Upload und Bilder den Schlüssel aus den QR-Codes (`?z=` oder Header `X-Zugang`). Der Schlüssel steht in `settings` unter `galerie_schluessel`, bewusst nicht in `DEFAULTS`, und kommt nie über `/api/info`. Die Gästeseite speichert ihn im localStorage, nicht als Cookie
+- Einmal-Anmeldung für ein vorgeschaltetes Portal: `GET /admin/einmal?t=...`, nur aktiv mit der Umgebungsvariable `PORTAL_GEHEIMNIS`. Der Link ist eine Minute gültig und einmal nutzbar (HMAC-SHA256 über Zeit, Name und Zufallswert). Ungültig oder abgelaufen führt auf die normale Anmeldeseite
 - Öffentlich: `GET /api/info`, `GET /api/seite`, `POST /api/rsvp`, `GET /kalender.ics`, `GET` und `POST /api/gaestefotos`, Fotos unter `/gaestefotos/<id>.jpg`
 - Verwaltung unter `/api/admin/...`, nur mit Anmeldung (Cookie `hz_s`)
 - Neue Spalten werden beim Start mit `ALTER TABLE ... ADD COLUMN` ergänzt, wenn sie fehlen (Beispiele in `planung.js`). Bestehende Daten dürfen dabei nie verloren gehen.

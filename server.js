@@ -12,7 +12,7 @@ import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -552,6 +552,32 @@ figcaption span{color:#4b5563;font-size:10px}</style></head><body>
 <script>addEventListener('load',()=>setTimeout(()=>print(),300))</script></body></html>`;
 }
 
+// Anmeldung über ein vorgeschaltetes Portal (zum Beispiel ein Kundenkonto): Das Portal baut mit dem gemeinsamen Geheimnis
+// PORTAL_GEHEIMNIS einen Link, der eine Minute lang und nur einmal gilt. Ohne Geheimnis ist die Funktion aus.
+// Link: /admin/einmal?t=<zeit>.<name base64url>.<zufall>.<hmac sha256 hex über die ersten drei Teile>
+const PORTAL_GEHEIMNIS = process.env.PORTAL_GEHEIMNIS || '';
+const verbraucht = new Map(); // Zufallswert -> Ablaufzeit
+function einmalAnmeldung(req, res, url) {
+  const zurueck = { Location: '/admin', 'Cache-Control': 'no-store', 'Referrer-Policy': 'same-origin' };
+  if (!PORTAL_GEHEIMNIS) return send(res, 404, 'Nicht gefunden', 'text/plain; charset=utf-8');
+  if (limited(`einmal:${clientIp(req)}`, 20, 600_000)) return send(res, 429, 'Zu viele Versuche', 'text/plain; charset=utf-8');
+  const [zeit, name64, zufall, sig] = String(url.searchParams.get('t') || '').split('.');
+  const jetzt = Date.now();
+  for (const [z, bis] of verbraucht) if (bis < jetzt) verbraucht.delete(z);
+  const erwartet = crypto.createHmac('sha256', PORTAL_GEHEIMNIS).update(`${zeit}.${name64}.${zufall}`).digest('hex');
+  const a = Buffer.from(String(sig || '')), b = Buffer.from(erwartet);
+  const echt = a.length === b.length && crypto.timingSafeEqual(a, b);
+  const frisch = Math.abs(jetzt / 1000 - Number(zeit)) <= 60;
+  const u = echt && frisch && zufall && !verbraucht.has(zufall) ? db.prepare('SELECT name FROM users WHERE name = ?').get(Buffer.from(name64, 'base64url').toString('utf8')) : null;
+  if (!u) { res.writeHead(302, zurueck); return res.end(); } // abgelaufen oder ungültig: normale Anmeldeseite
+  verbraucht.set(zufall, jetzt + 120_000);
+  const token = crypto.randomBytes(32).toString('hex');
+  const tage = 60;
+  db.prepare('INSERT INTO sessions (token, user, expires) VALUES (?, ?, ?)').run(token, u.name, jetzt + tage * 864e5);
+  res.writeHead(302, { ...zurueck, 'Set-Cookie': `hz_s=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${tage * 86400}${isHttps(req) ? '; Secure' : ''}` });
+  res.end();
+}
+
 async function admin(req, res, url) {
   const p = url.pathname;
   if (p === '/api/admin/session' && req.method === 'GET') {
@@ -700,6 +726,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, kalender(welche), 'text/calendar; charset=utf-8', { 'Content-Disposition': `inline; filename="${datei}"` });
     }
     if (p === '/impressum' || p === '/datenschutz') return send(res, 200, rechtsSeite(p.slice(1)), 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache' });
+    if (p === '/admin/einmal' && req.method === 'GET') return einmalAnmeldung(req, res, url);
     if (p === '/admin' || p === '/admin/') return serveHtml(res, 'admin.html');
     const html = (inhalt) => send(res, 200, inhalt, 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache' });
     if (p === '/' || /^\/p\/[A-Za-z0-9-]{3,16}\/?$/.test(p)) return html(geruest.seite('start'));

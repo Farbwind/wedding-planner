@@ -127,6 +127,7 @@ docker run -d --name hochzeit -p 8080:3000 -v hochzeit-daten:/data \
 | `PUBLIC_URL` | Adresse, unter der die Seite erreichbar ist (für QR-Code und Kalender) | `http://localhost:8080` |
 | `ADMIN_USERS` | Zugänge zur Verwaltung, mit Komma getrennt | `Anna,Ben` |
 | `ADMIN_PASSWORD` | Erstes Passwort für Zugänge ohne Passwort, mindestens 8 Zeichen | nicht gesetzt |
+| `PORTAL_GEHEIMNIS` | Nur für den Betrieb hinter einem Portal (zum Beispiel einem Kundenkonto): erlaubt einen einmaligen Anmeldelink unter `/admin/einmal`, den das Portal mit diesem Geheimnis signiert. Leer lassen, wenn du so etwas nicht brauchst | nicht gesetzt |
 | `TZ` | Zeitzone | `Europe/Berlin` |
 
 Alle Daten liegen im Volume `/data`: SQLite-Datenbank, Bilder der Website und, getrennt davon, die Fotos der Gäste in `/data/gaestefotos/<abschnitt>/`.
