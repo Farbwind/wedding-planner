@@ -64,7 +64,7 @@ Nach der Hochzeit hat jeder Gast ein paar gute Bilder, aber niemand hat alle. Hi
 
 </details>
 
-Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefotos sind gezeichnet. Das Design der Gästeseite ist bewusst schlicht gehalten, damit du es leicht an euren Stil anpassen kannst.
+Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefotos sind mit KI erzeugt und zeigen keine echten Personen. Das Design der Gästeseite ist bewusst schlicht gehalten, damit du es leicht an euren Stil anpassen kannst.
 
 ## Was drin ist
 
