@@ -283,7 +283,17 @@
       <details class="block neu-block" id="gf-einrichtung">
         <summary>Abschnitte, QR-Codes und Galerie</summary>
         <p class="hilfe">Jeder Abschnitt hat einen eigenen Ordner und einen eigenen QR-Code. Wer den Code scannt, landet direkt beim Hochladen, der Abschnitt ist schon ausgewählt. Geschlossene Abschnitte nehmen keine Fotos an, ihre Bilder bleiben aber in der Galerie. Ohne Code wählt die Seite <a href="/fotos" target="_blank" rel="noopener">/fotos</a> automatisch den Abschnitt vor, der gerade dran ist: nach Datum und, wenn es mehrere am selben Tag gibt, nach der Uhrzeit „ab“. Gäste können die Auswahl jederzeit ändern.</p>
-        <label class="haken gf-galerie"><input type="checkbox" id="gf-galerie"> Galerie für Gäste sichtbar (alle sehen die hochgeladenen Fotos auf /fotos)</label>
+        <fieldset class="gf-zugang">
+          <legend>Wer kommt an die Fotoseite?</legend>
+          <label class="haken"><input type="radio" name="gf-zugang" value="offen"> <span><b>Jeder mit dem Link</b> Wer die Adresse /fotos kennt, kann Fotos ansehen und hochladen.</span></label>
+          <label class="haken"><input type="radio" name="gf-zugang" value="qr"> <span><b>Nur mit dem QR-Code vom Tisch</b> Der Code auf den Karten enthält einen Schlüssel. Ohne ihn bleiben Galerie und Hochladen zu. Sicherer, wenn die Fotos nicht öffentlich sein sollen.</span></label>
+          <div class="gf-schluessel" id="gf-schluessel" hidden>
+            <p class="hilfe">Zugangscode auf den Karten: <strong id="gf-schluessel-text"></strong></p>
+            <button type="button" class="knopf leise" id="gf-schluessel-neu">Neuen Code erzeugen</button>
+            <p class="hilfe">Ein neuer Code macht alle bisher gedruckten QR-Codes ungültig. Das hilft, wenn ein Code in falsche Hände geraten ist. Druckt die Aufsteller dann neu.</p>
+          </div>
+        </fieldset>
+        <label class="haken gf-galerie"><input type="checkbox" id="gf-galerie"> Galerie für Gäste sichtbar (alle, die Zugang haben, sehen die hochgeladenen Fotos auf /fotos)</label>
         <div id="gf-abschnitte" class="gf-abschnitte"></div>
         <form id="gf-neu" class="gf-neu">
           <label>Neuer Abschnitt<input name="name" maxlength="60" placeholder="z. B. Sektempfang"></label>

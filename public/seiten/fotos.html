@@ -4,6 +4,18 @@
     <p class="einleitung">Ihr habt schöne Momente eingefangen? Ladet sie hier hoch. So sammeln wir alle Bilder von unserem Tag an einem Ort.</p>
   </header>
 
+  <section class="foto-gesperrt" aria-labelledby="gesperrt-titel" data-feld="gesperrt" hidden>
+    <h2 id="gesperrt-titel" class="sr">Zugang zu den Fotos</h2>
+    <form class="beitrag-form code-form" data-feld="code-form" novalidate>
+      <p data-feld="gesperrt-text"></p>
+      <div class="feld">
+        <label for="f-code">Code von der Karte</label>
+        <input id="f-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="XXXX-XXXX-XXXX-XXXX">
+      </div>
+      <button class="knopf" type="submit">Weiter</button>
+    </form>
+  </section>
+
   <section class="foto-upload" aria-labelledby="upload-titel">
     <h2 id="upload-titel" class="sr">Fotos hochladen</h2>
     <form id="upload-form" class="beitrag-form upload-form" novalidate hidden>

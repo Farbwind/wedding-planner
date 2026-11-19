@@ -481,6 +481,14 @@ body.zieht, body.zieht * { cursor: grabbing !important; user-select: none; }
 
 /* Gästefotos */
 .gf-galerie { margin: 4px 0 6px; font-weight: 500; }
+.gf-zugang { border: 1px solid var(--linie, #d8ddd6); border-radius: 12px; padding: 10px 16px 6px; margin: 8px 0 12px; }
+.gf-zugang legend { font-weight: 600; padding: 0 6px; }
+.gf-zugang .haken { align-items: flex-start; padding-bottom: 8px; font-weight: 400; }
+.gf-zugang .haken b { display: block; font-weight: 600; }
+.gf-zugang .haken input { width: 18px; height: 18px; flex: none; margin: 3px 0 0; accent-color: var(--ja); }
+.gf-zugang .haken span { flex: 1; min-width: 0; }
+.gf-schluessel { padding: 4px 0 8px 24px; display: grid; gap: 6px; justify-items: start; }
+.gf-schluessel strong { white-space: nowrap; font-family: ui-monospace, Menlo, monospace; letter-spacing: .06em; }
 .gf-abschnitte { display: grid; gap: 12px; margin: 6px 0 16px; }
 .gf-abschnitt { display: grid; grid-template-columns: 88px 1fr auto; gap: 16px; align-items: center; padding: 12px; border-radius: 12px; box-shadow: 0 0 0 1px var(--linie); background: #fff; }
 .gf-qr img { display: block; width: 88px; height: 88px; border-radius: 8px; box-shadow: 0 0 0 1px var(--linie); }

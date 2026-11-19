@@ -5,10 +5,11 @@ const feld = (n) => document.querySelector(`[data-feld="${n}"]`);
 const form = document.getElementById('upload-form');
 const NAME = 'hochzeit-fotoname';
 const ABSCHNITT = 'hochzeit-fotoabschnitt';
+const SCHLUESSEL = 'hochzeit-fotoschluessel';
 const GROSS = 3000; // längste Seite in Pixeln
 const KLEIN = 480;
 
-let daten = { abschnitte: [], fotos: [], galerie: false };
+let daten = { abschnitte: [], fotos: [], galerie: false, erlaubt: true, modus: 'offen' };
 let filter = 0;
 let sicht = [];
 let pos = 0;
@@ -16,6 +17,10 @@ let pos = 0;
 const merken = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 const lesen = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
 const fehler = (text) => { const f = feld('fehler'); f.textContent = text; f.hidden = !text; };
+// Zugangsschlüssel aus dem QR-Code (?z=...) oder aus einem früheren Besuch. Nur nötig, wenn die Fotoseite auf „nur mit QR-Code“ steht.
+const normal = (t) => String(t || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+let schluessel = normal(new URLSearchParams(location.search).get('z')) || normal(lesen(SCHLUESSEL));
+const mitSchluessel = (u) => (schluessel ? `${u}?z=${schluessel}` : u);
 const tag = (iso) => (iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' }) : '');
 
 // Name aus früheren Besuchen oder aus der Zusage übernehmen
@@ -26,7 +31,7 @@ function nameVorschlag() {
 }
 
 async function laden() {
-  const r = await fetch('/api/gaestefotos');
+  const r = await fetch('/api/gaestefotos', { headers: schluessel ? { 'X-Zugang': schluessel } : {} });
   if (!r.ok) throw new Error('Laden fehlgeschlagen');
   daten = await r.json();
 }
@@ -43,7 +48,16 @@ function jetztDran(liste) {
   return begonnen.length ? begonnen[begonnen.length - 1] : heutige[0];
 }
 
+function gesperrtZeichnen() {
+  const g = feld('gesperrt');
+  g.hidden = daten.erlaubt;
+  feld('gesperrt-text').textContent = schluessel
+    ? 'Dieser Code passt leider nicht (mehr). Scannt den QR-Code auf eurem Tisch noch einmal oder tragt den Code von der Karte ein.'
+    : 'Die Fotos sind nur über den QR-Code auf eurem Tisch erreichbar. Scannt ihn mit der Kamera oder tragt den Code von der Karte hier ein.';
+}
+
 function uploadZeichnen() {
+  if (!daten.erlaubt) { form.hidden = true; feld('geschlossen').hidden = true; return; }
   const offen = daten.abschnitte.filter((a) => a.offen);
   form.hidden = !offen.length;
   feld('geschlossen').hidden = !!offen.length;
@@ -63,8 +77,8 @@ function uploadZeichnen() {
 
 function galerieZeichnen() {
   const g = feld('galerie');
-  g.hidden = !daten.galerie;
-  if (!daten.galerie) return;
+  g.hidden = !daten.galerie || !daten.erlaubt;
+  if (g.hidden) return;
   const mitFotos = daten.abschnitte.filter((a) => a.anzahl);
   feld('filter').innerHTML = [`<button type="button" data-filter="0" aria-pressed="${filter === 0}">Alle <span>${daten.fotos.length}</span></button>`,
     ...mitFotos.map((a) => `<button type="button" data-filter="${a.id}" aria-pressed="${filter === a.id}">${esc(a.name)} <span>${a.anzahl}</span></button>`)].join('');
@@ -72,7 +86,7 @@ function galerieZeichnen() {
   sicht = daten.fotos.filter((f) => !filter || f.abschnitt_id === filter);
   feld('raster').innerHTML = sicht.map((f, i) => `
     <button type="button" class="galerie-foto" data-i="${i}" aria-label="Foto von ${esc(f.name)} öffnen">
-      <img src="/gaestefotos/${f.id}/vorschau.jpg" alt="" loading="lazy" ${f.breite && f.hoehe ? `width="${f.breite}" height="${f.hoehe}"` : ''}>
+      <img src="${mitSchluessel(`/gaestefotos/${f.id}/vorschau.jpg`)}" alt="" loading="lazy" ${f.breite && f.hoehe ? `width="${f.breite}" height="${f.hoehe}"` : ''}>
     </button>`).join('');
   feld('galerie-leer').hidden = !!sicht.length;
 }
@@ -90,7 +104,7 @@ function zeigen(i) {
   pos = (i + sicht.length) % sicht.length;
   const f = sicht[pos];
   const a = daten.abschnitte.find((x) => x.id === f.abschnitt_id);
-  feld('gross').src = `/gaestefotos/${f.id}.jpg`;
+  feld('gross').src = mitSchluessel(`/gaestefotos/${f.id}.jpg`);
   feld('gross').alt = `Foto von ${f.name}`;
   feld('gross-text').textContent = [`Von ${f.name}`, a?.name].filter(Boolean).join(' · ');
   if (!kasten.open) kasten.showModal();
@@ -134,6 +148,7 @@ function senden(abschnitt, name, koerper, vorschauLaenge, sha, breite, hoehe, fo
     x.open('POST', `/api/gaestefotos?abschnitt=${abschnitt}`);
     x.setRequestHeader('Content-Type', 'application/octet-stream');
     x.setRequestHeader('X-Name', encodeURIComponent(name));
+    if (schluessel) x.setRequestHeader('X-Zugang', schluessel);
     x.setRequestHeader('X-Sha256', sha);
     x.setRequestHeader('X-Vorschau-Laenge', String(vorschauLaenge));
     x.setRequestHeader('X-Breite', String(breite));
@@ -215,8 +230,23 @@ form.fotos.addEventListener('change', async () => {
   }
 });
 
+// Code von Hand eintragen (für Gäste, die den QR-Code nicht scannen können)
+feld('code-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const eingabe = normal(e.target.code.value);
+  if (!eingabe) return;
+  schluessel = eingabe;
+  try {
+    await laden();
+    if (daten.erlaubt) { merken(SCHLUESSEL, schluessel); location.replace(`/fotos?z=${schluessel}`); return; }
+  } catch {}
+  gesperrtZeichnen();
+});
+
 try {
   await laden();
+  if (daten.erlaubt && schluessel) merken(SCHLUESSEL, schluessel);
+  gesperrtZeichnen();
   uploadZeichnen();
   galerieZeichnen();
 } catch {

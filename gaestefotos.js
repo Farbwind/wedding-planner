@@ -74,13 +74,34 @@ CREATE TABLE IF NOT EXISTS vorlagen (name TEXT PRIMARY KEY);
     return t.replace(/-/g, '').replace(' ', '-').replace(/:/g, '');
   };
   const galerieAn = () => getSettings().galerie_gaeste !== '0';
+
+  // Zugang: 'offen' = jeder mit dem Link, 'qr' = nur mit dem Schlüssel, der in den gedruckten QR-Codes steckt.
+  // Der Schlüssel steht in settings (nicht in DEFAULTS, damit er nie über /api/info nach außen gelangt).
+  const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const neuerSchluessel = () => Array.from(crypto.randomBytes(16), (b) => ALPHABET[b % 32]).join('');
+  const normal = (t) => String(t || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const schoen = (k) => k.match(/.{1,4}/g).join('-');
+  const upsert = db.prepare("INSERT INTO settings (key, value) VALUES ('galerie_schluessel', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value");
+  const schluessel = () => {
+    const r = db.prepare("SELECT value FROM settings WHERE key = 'galerie_schluessel'").get();
+    if (r) return r.value;
+    const k = neuerSchluessel(); upsert.run(k); return k;
+  };
+  const zugangQr = () => getSettings().galerie_zugang === 'qr';
+  const zugangOk = (req, url) => {
+    if (!zugangQr() || sessionUser(req)) return true;
+    const z = normal(req.headers['x-zugang'] || url.searchParams.get('z'));
+    const k = schluessel();
+    return z.length === k.length && crypto.timingSafeEqual(Buffer.from(z), Buffer.from(k));
+  };
   const abschnitte = (nurSichtbare) => db.prepare(`SELECT a.*, (SELECT COUNT(*) FROM gaestefotos f WHERE f.abschnitt_id = a.id${nurSichtbare ? ' AND f.versteckt = 0' : ''}) AS anzahl
     FROM foto_abschnitte a ORDER BY a.sort, a.id`).all();
   const pfadVon = (f) => {
     const a = db.prepare('SELECT ordner FROM foto_abschnitte WHERE id = ?').get(f.abschnitt_id);
     return path.join(ORDNER, a ? a.ordner : '_ohne-abschnitt', f.datei);
   };
-  const fotoUrl = (id) => `${PUBLIC_URL}/fotos?a=${id}`;
+  const fotoUrl = (id) => `${PUBLIC_URL}/fotos?a=${id}${zugangQr() ? `&z=${schluessel()}` : ''}`;
+  const alleUrl = () => `${PUBLIC_URL}/fotos${zugangQr() ? `?z=${schluessel()}` : ''}`;
 
   async function leseRoh(req, limit) {
     const teile = []; let groesse = 0;
@@ -167,6 +188,7 @@ CREATE TABLE IF NOT EXISTS vorlagen (name TEXT PRIMARY KEY);
     const s = getSettings();
     const liste = db.prepare('SELECT * FROM foto_abschnitte WHERE offen = 1 ORDER BY sort, id').all();
     const host = new URL(PUBLIC_URL).host;
+    const qr = zugangQr();
     const karten = [];
     for (const a of liste) {
       const svg = await QRCode.toString(fotoUrl(a.id), { ...QR_OPTS, type: 'svg' });
@@ -176,7 +198,7 @@ CREATE TABLE IF NOT EXISTS vorlagen (name TEXT PRIMARY KEY);
         <p class="abschnitt">${esc(a.name)}</p>
         <div class="qr">${svg}</div>
         <ol><li>Kamera öffnen und den Code scannen</li><li>Namen eintragen</li><li>Fotos auswählen, fertig</li></ol>
-        <p class="adresse">oder ${esc(host)}/fotos</p>
+        <p class="adresse">oder ${esc(host)}/fotos${qr ? `<br>Code: <b>${esc(schoen(schluessel()))}</b>` : ''}</p>
       </section>`);
     }
     return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Aufsteller Gästefotos</title>
@@ -194,7 +216,7 @@ h1{margin:2mm 0 0;font:500 27pt/1 "Cormorant Garamond",serif;color:#2e4636}
 .abschnitt{margin:3mm 0 0;font-weight:600;font-size:10pt;letter-spacing:.14em;text-transform:uppercase;color:#536156}
 .qr{width:52mm;margin:5mm 0 3mm}.qr svg{width:100%;height:auto;display:block}
 ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;color:#1f2b23}
-.adresse{margin:auto 0 0;font-size:8.5pt;color:#536156}
+.adresse{margin:auto 0 0;font-size:8.5pt;line-height:1.5;color:#536156}.adresse b{letter-spacing:.06em;color:#1f2b23}
 @media print{body{background:none}.knopf{display:none}main{padding:0}}
 </style></head><body>
 <button class="knopf" onclick="print()">Drucken</button>
@@ -209,10 +231,13 @@ ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;c
 
     // Öffentlich: Abschnitte und sichtbare Fotos
     if (p === '/api/gaestefotos' && m === 'GET') {
-      const galerie = galerieAn();
+      const erlaubt = zugangOk(req, url);
+      const galerie = galerieAn() && erlaubt;
       json(res, 200, {
+        modus: zugangQr() ? 'qr' : 'offen',
+        erlaubt,
         galerie,
-        abschnitte: abschnitte(true).map((a) => ({ id: a.id, name: a.name, datum: a.datum, ab: a.ab, offen: !!a.offen, anzahl: galerie ? a.anzahl : 0 })),
+        abschnitte: !erlaubt ? [] : abschnitte(true).map((a) => ({ id: a.id, name: a.name, datum: a.datum, ab: a.ab, offen: !!a.offen, anzahl: galerie ? a.anzahl : 0 })),
         fotos: galerie ? db.prepare('SELECT id, abschnitt_id, name, breite, hoehe, erstellt FROM gaestefotos WHERE versteckt = 0 ORDER BY id DESC').all() : [],
       });
       return true;
@@ -222,6 +247,7 @@ ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;c
     if (p === '/api/gaestefotos' && m === 'POST') {
       // Auf der Feier teilen sich viele Gäste dasselbe WLAN, also eine IP: Grenze großzügig
       if (limited(`gfoto:${clientIp(req)}`, 2000, 3600_000)) { json(res, 429, { error: 'Gerade kommen sehr viele Fotos an. Bitte gleich noch einmal versuchen.' }); return true; }
+      if (!zugangOk(req, url)) { json(res, 403, { error: 'Zum Hochladen braucht ihr den QR-Code vom Tisch.' }); return true; }
       const a = db.prepare('SELECT * FROM foto_abschnitte WHERE id = ?').get(int(url.searchParams.get('abschnitt'), 0, 1e9));
       if (!a) { json(res, 400, { error: 'Bitte wählt aus, wo die Fotos entstanden sind.', field: 'abschnitt' }); return true; }
       if (!a.offen) { json(res, 403, { error: `Für „${a.name}“ ist das Hochladen gerade geschlossen.` }); return true; }
@@ -248,7 +274,7 @@ ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;c
     // Fotos ausliefern: für Gäste nur bei offener Galerie, angemeldet immer
     if ((t = p.match(/^\/gaestefotos\/(\d+)(\/vorschau)?\.jpg$/)) && m === 'GET') {
       const f = db.prepare('SELECT * FROM gaestefotos WHERE id = ?').get(Number(t[1]));
-      const darf = f && (sessionUser(req) || (galerieAn() && !f.versteckt));
+      const darf = f && (sessionUser(req) || (galerieAn() && !f.versteckt && zugangOk(req, url)));
       const datei = f && (t[2] ? path.join(VORSCHAU, f.datei) : pfadVon(f));
       if (!darf || !fs.existsSync(datei)) { send(res, 404, 'Nicht gefunden', 'text/plain; charset=utf-8'); return true; }
       const extra = { 'Cache-Control': 'private, max-age=600' };
@@ -264,10 +290,17 @@ ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;c
     if (p === '/api/admin/gaestefotos' && m === 'GET') {
       json(res, 200, {
         galerie: galerieAn(),
+        zugang: zugangQr() ? 'qr' : 'offen',
+        schluessel: schoen(schluessel()),
         publicUrl: PUBLIC_URL,
         abschnitte: abschnitte(false).map((a) => ({ ...a, url: fotoUrl(a.id) })),
         fotos: db.prepare('SELECT id, abschnitt_id, name, datei, groesse, breite, hoehe, versteckt, erstellt FROM gaestefotos ORDER BY id DESC').all(),
       });
+      return true;
+    }
+    if (p === '/api/admin/gaestefotos/schluessel' && m === 'POST') {
+      upsert.run(neuerSchluessel());
+      json(res, 200, { ok: true, schluessel: schoen(schluessel()) });
       return true;
     }
     if (p === '/api/admin/gaestefotos/abschnitt' && m === 'POST') {
@@ -344,7 +377,7 @@ ol{margin:0;padding:0 0 0 5mm;text-align:left;font-size:9.5pt;line-height:1.55;c
       return true;
     }
     if ((t = p.match(/^\/api\/admin\/gaestefotos\/qr\/(\d+|alle)\.(svg|png)$/)) && m === 'GET') {
-      const ziel = t[1] === 'alle' ? `${PUBLIC_URL}/fotos` : fotoUrl(Number(t[1]));
+      const ziel = t[1] === 'alle' ? alleUrl() : fotoUrl(Number(t[1]));
       const a = t[1] === 'alle' ? null : db.prepare('SELECT name FROM foto_abschnitte WHERE id = ?').get(Number(t[1]));
       const fname = `qr-fotos-${a ? slug(a.name) : 'alle'}.${t[2]}`;
       const dl = url.searchParams.has('download') ? { 'Content-Disposition': `attachment; filename="${fname}"` } : {};

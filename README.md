@@ -29,6 +29,7 @@ Nach der Hochzeit hat jeder Gast ein paar gute Bilder, aber niemand hat alle. Hi
 - Jedes Foto wird beim Hochladen per Prüfsumme kontrolliert. Bei schlechtem Netz sendet die Seite bis zu viermal neu, das hilft auf Feiern mit schwachem Empfang.
 - Du entscheidest, wann hochgeladen werden darf: Abschnitte lassen sich einzeln öffnen und schließen. Ohne QR-Code wählt die Fotoseite am Hochzeitstag automatisch den Abschnitt, der gerade dran ist.
 - Die Galerie kannst du für Gäste ausschalten, dann siehst nur du sie in der Verwaltung.
+- Du entscheidest, wer an die Fotoseite kommt: jeder mit dem Link oder nur mit dem QR-Code vom Tisch. Im zweiten Fall steckt ein geheimer Schlüssel im Code, ohne ihn bleiben Galerie und Hochladen zu. Auf dem Aufsteller steht der Code zusätzlich zum Abtippen, und du kannst ihn jederzeit erneuern.
 - Du kannst Fotos in einen anderen Abschnitt verschieben, verbergen oder löschen.
 - Ein passender Absatz in der Datenschutzerklärung ist schon dabei.
 - Die Fotos liegen getrennt von den Daten der Seite in `/data/gaestefotos/<abschnitt>/`.

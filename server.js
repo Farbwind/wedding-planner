@@ -12,7 +12,7 @@ import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -108,6 +108,8 @@ const DEFAULTS = {
   platz_standesamt: '', platz_feier: '',
   // Gästefotos: Galerie auf /fotos für Gäste sichtbar ('1') oder nur in der Verwaltung ('0')
   galerie_gaeste: '1',
+  // Wer die Fotoseite nutzen darf: 'offen' (jeder mit dem Link) oder 'qr' (nur mit dem Schlüssel aus den gedruckten QR-Codes)
+  galerie_zugang: 'offen',
   // Design: Haupt-, Hintergrund- und Textfarbe der Gästeseite als #rrggbb, leer = Standard aus style.css
   design_akzent: '',
   design_grund: '',
@@ -607,6 +609,7 @@ async function admin(req, res, url) {
           const v = String(b[k]);
           if (v && !colorPattern.test(v)) return json(res, 400, { error: 'Bitte eine Farbe im Format #rrggbb angeben.' });
         }
+        if (k === 'galerie_zugang' && !['offen', 'qr'].includes(String(b[k]))) return json(res, 400, { error: 'Zugang: offen oder qr.' });
         up.run(k, str(b[k], 1000));
       }
       return json(res, 200, getSettings());

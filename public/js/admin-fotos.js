@@ -14,7 +14,7 @@ async function api(pfad, opts = {}) {
   return d;
 }
 
-let daten = { abschnitte: [], fotos: [], galerie: true };
+let daten = { abschnitte: [], fotos: [], galerie: true, zugang: 'offen', schluessel: '' };
 let filter = 0;
 let offen = false;
 
@@ -59,6 +59,9 @@ function zeichnen() {
 
   // Einrichtung
   $('#gf-galerie').checked = daten.galerie;
+  for (const r of document.querySelectorAll('input[name="gf-zugang"]')) r.checked = r.value === daten.zugang;
+  $('#gf-schluessel').hidden = daten.zugang !== 'qr';
+  $('#gf-schluessel-text').textContent = daten.schluessel;
   $('#gf-abschnitte').innerHTML = abschnitte.map((a, i) => `
     <div class="gf-abschnitt" data-id="${a.id}">
       <a class="gf-qr" href="/api/admin/gaestefotos/qr/${a.id}.svg" target="_blank" rel="noopener" title="QR-Code groß ansehen"><img src="/api/admin/gaestefotos/qr/${a.id}.svg" alt="QR-Code für ${esc(a.name)}" width="88" height="88"></a>
@@ -103,6 +106,18 @@ $('#gf-filter').addEventListener('click', (e) => {
 
 $('#gf-galerie').addEventListener('change', async (e) => {
   await api('/api/admin/settings', { method: 'PUT', body: { galerie_gaeste: e.target.checked ? '1' : '0' } }).catch((x) => alert(x.message));
+  laden();
+});
+
+document.querySelectorAll('input[name="gf-zugang"]').forEach((r) => r.addEventListener('change', async (e) => {
+  if (!e.target.checked) return;
+  if (e.target.value === 'qr' && !confirm('Nur mit QR-Code: Die bisherigen QR-Codes und Links ohne Schlüssel funktionieren danach nicht mehr. Druckt die Aufsteller neu (Knopf unten). Umstellen?')) return laden();
+  await api('/api/admin/settings', { method: 'PUT', body: { galerie_zugang: e.target.value } }).catch((x) => alert(x.message));
+  laden();
+}));
+$('#gf-schluessel-neu').addEventListener('click', async () => {
+  if (!confirm('Neuen Code erzeugen? Alle bisher gedruckten QR-Codes und der Code auf den Karten funktionieren dann nicht mehr.')) return;
+  await api('/api/admin/gaestefotos/schluessel', { method: 'POST' }).catch((x) => alert(x.message));
   laden();
 });
 
