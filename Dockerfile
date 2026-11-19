@@ -12,7 +12,7 @@ COPY package.json ./
 # Schriften selbst ausliefern (keine Google-Fonts-Abrufe bei den Gästen)
 RUN npm install --omit=dev --no-audit --no-fund \
  && mkdir -p public/fonts \
- && for f in cormorant-garamond hanken-grotesk; do \
+ && for f in cormorant-garamond hanken-grotesk baloo-2; do \
       cp node_modules/@fontsource/$f/files/$f-latin-*.woff2 node_modules/@fontsource/$f/files/$f-latin-ext-*.woff2 public/fonts/ ; \
     done \
  && rm -rf node_modules/@fontsource

@@ -24,7 +24,7 @@ Danach `http://localhost:8080` (Gäste) und `http://localhost:8080/admin` (Verwa
 | `public/seiten/*.html` | Inhalt der Gästeseiten (ohne Kopf und Fuß). Startseite: `start.html` |
 | `public/app.js` | Logik der Startseite: lädt `/api/info`, füllt die Felder, steuert das Antwortformular |
 | `public/js/*.js` | Skripte der Unterseiten (`geschichte.js`, `quiz.js`, `kontakt.js`), `basis.js` (Menü, Hilfen) und die Skripte der Verwaltung (`admin-*.js`) |
-| `public/admin.html`, `admin.css`, `admin.js` | Verwaltung. Seit 1.7.0 im Look des Kundenkontos (Salbei und Mint, Hanken Grotesk in kräftigen Überschriften, runde weiche Karten): die Tokens und Überschreibungen stehen am Ende von `admin.css` |
+| `public/admin.html`, `admin.css`, `admin.js` | Verwaltung. Seit 1.7.0 im Look von Farbwind OS in Grüntönen (Seitenleiste links, Glaskarten, runde Schrift Baloo 2, Symbole als Inline-SVG mit der Klasse `i`): die Tokens und Überschreibungen stehen am Ende von `admin.css`. Auf schmalen Bildschirmen wird die Leiste zur Kopfzeile |
 | `Dockerfile` | Baut das Image und kopiert die Schriften aus `@fontsource` nach `public/fonts` |
 
 ## Regeln

@@ -28,18 +28,19 @@
 
 <div class="app" id="app" hidden>
   <header class="kopf">
-    <h1>Hochzeitsplanung</h1>
+    <h1 class="marke-name">Hochzeits<b>planung</b></h1>
+    <div class="windband" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <p class="countdown" id="countdown" aria-live="polite"></p>
     <nav class="reiter" aria-label="Bereiche">
-      <button type="button" data-reiter="gaesteliste" aria-current="page">Gästeliste</button>
-      <button type="button" data-reiter="sitzplan">Sitzplan</button>
-      <button type="button" data-reiter="ablauf">Ablauf</button>
-      <button type="button" data-reiter="todos">To-dos <span class="zaehler-marke" id="todo-marke" hidden></span></button>
-      <button type="button" data-reiter="kosten">Kosten</button>
-      <button type="button" data-reiter="inhalte">Inhalte</button>
-      <button type="button" data-reiter="gaestefotos">Gästefotos <span class="zaehler-marke" id="gf-marke" hidden></span></button>
-      <button type="button" data-reiter="qr">QR-Code</button>
-      <button type="button" data-reiter="angaben">Angaben</button>
+      <button type="button" data-reiter="gaesteliste" aria-current="page"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Gästeliste</button>
+      <button type="button" data-reiter="sitzplan"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="3.6" r="1.8"/><circle cx="12" cy="20.4" r="1.8"/><circle cx="3.6" cy="12" r="1.8"/><circle cx="20.4" cy="12" r="1.8"/></svg>Sitzplan</button>
+      <button type="button" data-reiter="ablauf"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ablauf</button>
+      <button type="button" data-reiter="todos"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>To-dos <span class="zaehler-marke" id="todo-marke" hidden></span></button>
+      <button type="button" data-reiter="kosten"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>Kosten</button>
+      <button type="button" data-reiter="inhalte"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>Inhalte</button>
+      <button type="button" data-reiter="gaestefotos"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>Gästefotos <span class="zaehler-marke" id="gf-marke" hidden></span></button>
+      <button type="button" data-reiter="qr"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h3M21 17v4"/></svg>QR-Code</button>
+      <button type="button" data-reiter="angaben"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>Angaben</button>
     </nav>
     <div class="kopf-rechts">
       <a href="/" target="_blank" rel="noopener">Seite ansehen</a>
