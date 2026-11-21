@@ -86,7 +86,7 @@ a { color: var(--gruen); }
       <tr><td><code>--farbe-auf-akzent</code></td><td>Schriftfarbe auf dem Akzent, automatisch hell oder dunkel</td></tr>
       <tr><td><code>--farbe-grund</code></td><td>Hintergrund der Seite</td></tr>
       <tr><td><code>--farbe-flaeche</code></td><td>Karten und Eingabefelder</td></tr>
-      <tr><td><code>--farbe-band</code></td><td>abgesetzte Bänder zwischen Abschnitten</td></tr>
+      <tr><td><code>--farbe-band</code></td><td>Flächenfarbe für Termine und Gut zu wissen, im Designer als „Flächenfarbe“ einstellbar</td></tr>
       <tr><td><code>--farbe-linie</code></td><td>feine Rahmen und Trennlinien</td></tr>
       <tr><td><code>--farbe-text</code>, <code>--farbe-text-weich</code></td><td>Fließtext und zurückhaltender Text</td></tr>
       <tr><td><code>--farbe-tief</code></td><td>dunkle Flächen: Countdown, Zusage, Fuß</td></tr>
@@ -102,7 +102,11 @@ a { color: var(--gruen); }
       <tr><td><code>data-hero</code></td><td><code>bogen</code>, <code>vollbild</code>, <code>geteilt</code>, <code>schlicht</code></td></tr>
       <tr><td><code>data-knoepfe</code></td><td><code>pille</code>, <code>eckig</code></td></tr>
       <tr><td><code>data-rundung</code></td><td><code>eckig</code>, <code>weich</code>, <code>rund</code></td></tr>
-      <tr><td><code>data-aus</code></td><td>Leerzeichen-getrennte Liste ausgeschalteter Effekte: <code>siegel</code>, <code>lichtpunkte</code>, <code>konfetti</code></td></tr>
+      <tr><td><code>data-stil</code></td><td>Charakter: <code>sanft</code>, <code>magazin</code>, <code>retro</code>, <code>polaroid</code>, <code>fliesen</code></td></tr>
+      <tr><td><code>data-flaechen</code></td><td><code>ruhig</code> oder <code>bunt</code> (Termine und Gut zu wissen auf der Flächenfarbe, Geschenke in der Hauptfarbe)</td></tr>
+      <tr><td><code>data-textur</code></td><td><code>keine</code> oder <code>papier</code> (feines Korn über der Seite)</td></tr>
+      <tr><td><code>data-dunkel</code></td><td>steht nur bei dunklem Hintergrund</td></tr>
+      <tr><td><code>data-aus</code></td><td>Leerzeichen-getrennte Liste ausgeschalteter Effekte: <code>siegel</code>, <code>lichtpunkte</code>, <code>konfetti</code>. Das Laufband ist ein eigener Block <code>.laufband</code> und fehlt, wenn es abgeschaltet ist</td></tr>
     </table>
 <pre><code>/* nur im geteilten Anfang größere Namen */
 html[data-hero="geteilt"] .namen { font-size: clamp(3rem, 8vw, 6rem); }</code></pre>
@@ -113,6 +117,7 @@ html[data-hero="geteilt"] .namen { font-size: clamp(3rem, 8vw, 6rem); }</code></
       <tr><td><code>.hero</code>, <code>.hero-inhalt</code>, <code>.hero-bild</code></td><td>Anfang, Textspalte und Foto</td></tr>
       <tr><td><code>.namen</code>, <code>.name</code>, <code>.und</code></td><td>die beiden Namen und das &amp;-Zeichen</td></tr>
       <tr><td><code>.hero-datum</code>, <code>.hero-ort</code>, <code>.hero-vorspann</code></td><td>Datum, Ort und Satz über den Namen</td></tr>
+      <tr><td><code>.laufband</code>, <code>.laufband-spur</code></td><td>durchlaufendes Band unter dem Anfang</td></tr>
       <tr><td><code>.hero-siegel</code>, <code>.hero-licht</code></td><td>drehendes Siegel und aufsteigende Lichtpunkte</td></tr>
       <tr><td><code>.countdown-zahlen</code>, <code>.zaehler</code></td><td>die Zähler für Tage, Stunden, Minuten</td></tr>
       <tr><td><code>.termin</code>, <code>.termin-kopf</code>, <code>.termin-ort</code></td><td>ein Termin im Ablauf</td></tr>
@@ -157,7 +162,7 @@ html[data-hero="geteilt"] .namen { font-size: clamp(3rem, 8vw, 6rem); }</code></
       <li><strong>Keine eigenen Formulare:</strong> <code>form</code>, <code>input</code>, <code>button</code>, <code>textarea</code> und <code>select</code> fehlen im Pro-Modus. Die Zusage übernimmt das vorhandene Formular.</li>
       <li><strong>Keine fremden Quellen:</strong> in CSS sind <code>@import</code> und <code>url(https://…)</code> gesperrt. Schriften und Bilder müssen von dieser Seite kommen oder als <code>data:image/…</code> eingebettet sein. Das schützt eure Gäste vor Tracking durch Dritte.</li>
       <li><strong>Größe:</strong> CSS und beide HTML-Bereiche je höchstens 30.000 Zeichen.</li>
-      <li><strong>Schriften:</strong> verfügbar sind die sechs Paarungen des Designers (Cormorant Garamond, Playfair Display, DM Serif Display, Fraunces, Pinyon Script, DM Sans, Hanken Grotesk). Weitere Schriften müssen als Datei auf dem Server liegen.</li>
+      <li><strong>Schriften:</strong> verfügbar sind die neun Paarungen des Designers (Cormorant Garamond, Playfair Display, DM Serif Display, Fraunces, Pinyon Script, Instrument Serif, Young Serif, Bricolage Grotesque, Caveat, DM Sans, Hanken Grotesk). Weitere Schriften müssen als Datei auf dem Server liegen.</li>
     </ul>
 
     <h2 id="rezepte">Beispiele</h2>

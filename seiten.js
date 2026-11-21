@@ -40,9 +40,11 @@ export function seitenGeruest({ VERSION, PUB, getSettings, getDesign }) {
 
   function layout({ name, titel, inhalt, skript, beschreibung, design }) {
     const p = paar();
-    const a = aufbereiten(design || getDesign());
+    const st = getSettings();
+    const datum = st.church_date ? new Date(`${st.church_date}T12:00:00`).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const a = aufbereiten(design || getDesign(), [p.voll, datum, st.party_place || st.church_place]);
     if (name === 'start') {
-      inhalt = inhalt.replace('<main>', `<main>\n<div class="pro-oben" style="order:-1">${a.oben}</div>`).replace('</main>', `${a.bloecke}\n<div class="pro-unten" style="order:9999">${a.unten}</div>\n</main>`);
+      inhalt = inhalt.replace('<main>', `<main>\n<div class="pro-oben" style="order:-1">${a.oben}</div>\n${a.laufband}`).replace('</main>', `${a.bloecke}\n<div class="pro-unten" style="order:9999">${a.unten}</div>\n</main>`);
     }
     const menue = MENUE.map(([href, text, seite]) =>
       `<a href="${href}"${seite === name && name !== 'start' ? ' aria-current="page"' : ''}>${esc(text)}</a>`).join('\n      ');

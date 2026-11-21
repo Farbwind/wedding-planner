@@ -23,8 +23,10 @@ const FARBEN = [
   ['text', 'Textfarbe', 'Fließtext und Namen'],
   ['gold', 'Zierfarbe', '&-Zeichen, Zahlen, feine Linien'],
   ['licht', 'Lichtfarbe', 'warmer Schimmer im Hintergrund'],
+  ['band', 'Flächenfarbe', 'Hintergrund von Termine und Gut zu wissen (leer = automatisch)'],
   ['tief', 'Dunkle Flächen', 'Countdown, Zusage und Fuß (leer = automatisch)'],
 ];
+const OPTIONAL = ['tief', 'band'];
 
 function status(text, neu) {
   $('#dsg-status').textContent = text;
@@ -55,9 +57,9 @@ function vorlagenZeichnen() {
     const f = v.design.farben; const sc = info.schriften.find((s) => s.id === v.design.schrift);
     return `<button type="button" class="dsg-vorlage${d.vorlage === v.id ? ' aktiv' : ''}" data-vorlage="${v.id}" aria-pressed="${d.vorlage === v.id}">
       <span class="dsg-vorlage-bild" style="background:${f.grund};color:${f.text};border-color:${f.text}22">
-        <span class="dsg-v-name" style="font-family:${sc.schreib || sc.titel};color:${f.akzent === f.grund ? f.text : f.akzent}">Anna &amp; Ben</span>
+        <span class="dsg-v-name" style="font-family:${esc(sc.schreib || sc.titel)};color:${f.akzent === f.grund ? f.text : f.akzent}">Anna &amp; Ben</span>
         <span class="dsg-v-linie" style="background:${f.gold}"></span>
-        <span class="dsg-v-punkte"><i style="background:${f.akzent}"></i><i style="background:${f.gold}"></i><i style="background:${f.licht}"></i><i style="background:${f.tief || f.akzent}"></i></span>
+        <span class="dsg-v-punkte"><i style="background:${f.akzent}"></i><i style="background:${f.gold}"></i><i style="background:${f.band || f.licht}"></i><i style="background:${f.tief || f.akzent}"></i></span>
       </span>
       <strong>${esc(v.name)}</strong><small>${esc(v.beschreibung)}</small></button>`;
   }).join('');
@@ -78,13 +80,13 @@ function farbenZeichnen() {
   $('#dsg-farben').innerHTML = FARBEN.map(([k, name, hinweis]) => {
     const w = d.farben[k] || '';
     return `<label class="dsg-farbe"><span><b>${name}</b><small>${hinweis}</small></span>
-      <span class="dsg-farbwahl"><input type="color" data-farbe="${k}" value="${w || (k === 'tief' ? '#1d3a2e' : '#000000')}" ${k === 'tief' && !w ? 'class="leer"' : ''}>
-      <input type="text" data-farbe-text="${k}" value="${esc(w)}" maxlength="7" placeholder="${k === 'tief' ? 'automatisch' : '#rrggbb'}" spellcheck="false"></span></label>`;
+      <span class="dsg-farbwahl"><input type="color" data-farbe="${k}" value="${w || (k === 'tief' ? '#1d3a2e' : k === 'band' ? '#eee6d4' : '#000000')}" ${OPTIONAL.includes(k) && !w ? 'class="leer"' : ''}>
+      <input type="text" data-farbe-text="${k}" value="${esc(w)}" maxlength="7" placeholder="${OPTIONAL.includes(k) ? 'automatisch' : '#rrggbb'}" spellcheck="false"></span></label>`;
   }).join('') + '<p class="hilfe">Hinweis: Auf sehr dunklem Hintergrund (Mitternacht) wird die Seite automatisch hell auf dunkel gesetzt.</p>';
 }
 function farbeSetzen(k, wert) {
   if (/^#[0-9a-fA-F]{6}$/.test(wert)) d.farben[k] = wert.toLowerCase();
-  else if (k === 'tief' && wert === '') delete d.farben.tief;
+  else if (OPTIONAL.includes(k) && wert === '') delete d.farben[k];
   else return;
   d.vorlage = 'eigene';
   aenderung(); vorlagenZeichnen();
@@ -98,9 +100,13 @@ $('#dsg-farben').addEventListener('input', (e) => {
 function formenZeichnen() {
   const wahl = (name, werte, aktuell, titel) => `<fieldset class="dsg-wahl"><legend>${titel}</legend><div class="filter" role="group">${werte.map(([k, t]) => `<button type="button" data-form="${name}" data-wert="${k}" aria-pressed="${aktuell === k}">${t}</button>`).join('')}</div></fieldset>`;
   $('#dsg-formen').innerHTML = `
+    <fieldset class="dsg-wahl"><legend>Charakter</legend><div class="dsg-schriften">${info.stile.map(([k, t, b]) => `
+      <button type="button" class="dsg-schrift${d.stil === k ? ' aktiv' : ''}" data-form="stil" data-wert="${k}" aria-pressed="${d.stil === k}"><strong>${esc(t)}</strong><small>${esc(b)}</small></button>`).join('')}</div></fieldset>
+    ${wahl('flaechen', [['ruhig', 'Ruhig, ein Hintergrund'], ['bunt', 'Farbige Flächen']], d.flaechen, 'Abschnitte')}
+    ${wahl('textur', [['keine', 'Glatt'], ['papier', 'Papierkorn']], d.textur, 'Oberfläche')}
     <fieldset class="dsg-wahl"><legend>Schrift</legend><div class="dsg-schriften">${info.schriften.map((s) => `
       <button type="button" class="dsg-schrift${d.schrift === s.id ? ' aktiv' : ''}" data-form="schrift" data-wert="${s.id}" aria-pressed="${d.schrift === s.id}">
-        <span style="font-family:${s.schreib || s.titel};font-size:1.7rem;line-height:1.1">Anna &amp; Ben</span><span style="font-family:${s.text}">Wir heiraten im Sommer</span><small>${esc(s.beschreibung)}</small></button>`).join('')}</div></fieldset>
+        <span style="font-family:${esc(s.schreib || s.titel)};font-size:1.7rem;line-height:1.1">Anna &amp; Ben</span><span style="font-family:${esc(s.text)}">Wir heiraten im Sommer</span><small>${esc(s.beschreibung)}</small></button>`).join('')}</div></fieldset>
     ${wahl('rundung', [['eckig', 'Eckig'], ['weich', 'Weich'], ['rund', 'Rund']], d.rundung, 'Rundung von Karten und Bildern')}
     ${wahl('knoepfe', [['pille', 'Pillenform'], ['eckig', 'Eckig']], d.knoepfe, 'Knöpfe')}`;
 }

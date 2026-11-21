@@ -13,9 +13,9 @@ import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 import { ablauf } from './ablauf.js';
 import { personenVon, kostZahlen, bereinigen } from './essen.js';
-import { bereinigen as designPruefen, standardDesign, VORLAGEN, SCHRIFTEN, SEKTIONEN, ELEMENTE, HEROS, BLOCKTYPEN } from './design.js';
+import { bereinigen as designPruefen, standardDesign, VORLAGEN, SCHRIFTEN, SEKTIONEN, ELEMENTE, HEROS, BLOCKTYPEN, STILE } from './design.js';
 
-const VERSION = '2.0.0';
+const VERSION = '2.1.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -673,7 +673,7 @@ async function admin(req, res, url) {
       live: liveDesign(), entwurf: holeJson('design_entwurf'),
       vorlagen: Object.entries(VORLAGEN).map(([id, v]) => ({ id, name: v.name, beschreibung: v.beschreibung, design: v.design })),
       schriften: Object.entries(SCHRIFTEN).map(([id, s]) => ({ id, name: s.name, beschreibung: s.beschreibung, titel: s.stapelTitel, text: s.stapelText, schreib: s.stapelName || '' })),
-      sektionen: SEKTIONEN, elemente: ELEMENTE, heros: HEROS, blocktypen: BLOCKTYPEN,
+      sektionen: SEKTIONEN, elemente: ELEMENTE, heros: HEROS, blocktypen: BLOCKTYPEN, stile: STILE,
     });
   }
   if (p === '/api/admin/design/entwurf' && req.method === 'PUT') {

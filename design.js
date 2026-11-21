@@ -15,32 +15,56 @@ const DMSANS = F('DM Sans', [[400, 'normal', 'dm-sans-latin-400-normal'], [500, 
 const FRAUNCES = F('Fraunces', [[400, 'normal', 'fraunces-latin-400-normal'], [500, 'normal', 'fraunces-latin-500-normal'], [400, 'italic', 'fraunces-latin-400-italic'], [500, 'italic', 'fraunces-latin-500-italic']]);
 const PINYON = F('Pinyon Script', [[400, 'normal', 'pinyon-script-latin-400-normal']]);
 
+const INSTRUMENT = F('Instrument Serif', [[400, 'normal', 'instrument-serif-latin-400-normal'], [400, 'italic', 'instrument-serif-latin-400-italic']]);
+const BRICOLAGE = F('Bricolage Grotesque', [[400, 'normal', 'bricolage-grotesque-latin-400-normal'], [500, 'normal', 'bricolage-grotesque-latin-500-normal'], [600, 'normal', 'bricolage-grotesque-latin-600-normal'], [700, 'normal', 'bricolage-grotesque-latin-700-normal']]);
+const YOUNG = F('Young Serif', [[400, 'normal', 'young-serif-latin-400-normal']]);
+const CAVEAT = F('Caveat', [[500, 'normal', 'caveat-latin-500-normal'], [700, 'normal', 'caveat-latin-700-normal']]);
+
 export const SCHRIFTEN = {
   klassisch: { name: 'Klassisch', beschreibung: 'Cormorant Garamond und Hanken Grotesk', titel: CORMORANT, text: HANKEN, stapelTitel: '"Cormorant Garamond", Georgia, serif', stapelText: '"Hanken Grotesk", system-ui, sans-serif' },
   elegant: { name: 'Elegant', beschreibung: 'Playfair Display und Hanken Grotesk', titel: PLAYFAIR, text: HANKEN, stapelTitel: '"Playfair Display", Georgia, serif', stapelText: '"Hanken Grotesk", system-ui, sans-serif' },
   modern: { name: 'Modern', beschreibung: 'DM Serif Display und DM Sans', titel: DMSERIF, text: DMSANS, stapelTitel: '"DM Serif Display", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif' },
   boho: { name: 'Boho', beschreibung: 'Fraunces und DM Sans', titel: FRAUNCES, text: DMSANS, stapelTitel: '"Fraunces", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif' },
   schreib: { name: 'Handschrift', beschreibung: 'Pinyon Script für die Namen, Cormorant Garamond und Hanken Grotesk', titel: CORMORANT, text: HANKEN, namenSchrift: PINYON, stapelTitel: '"Cormorant Garamond", Georgia, serif', stapelText: '"Hanken Grotesk", system-ui, sans-serif', stapelName: '"Pinyon Script", "Cormorant Garamond", cursive' },
+  magazin: { name: 'Magazin', beschreibung: 'Instrument Serif und DM Sans, große Namen wie auf einem Titelblatt', titel: INSTRUMENT, text: DMSANS, stapelTitel: '"Instrument Serif", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif' },
+  retro: { name: 'Retro', beschreibung: 'Young Serif und Bricolage Grotesque, kräftig und warm', titel: YOUNG, text: BRICOLAGE, stapelTitel: '"Young Serif", Georgia, serif', stapelText: '"Bricolage Grotesque", system-ui, sans-serif' },
+  hand: { name: 'Handgeschrieben', beschreibung: 'Caveat für die Namen, Fraunces und DM Sans', titel: FRAUNCES, text: DMSANS, namenSchrift: CAVEAT, stapelTitel: '"Fraunces", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif', stapelName: '"Caveat", "Fraunces", cursive' },
   schlicht: { name: 'Schlicht', beschreibung: 'DM Sans in Titeln und Text', titel: DMSANS, text: DMSANS, stapelTitel: '"DM Sans", system-ui, sans-serif', stapelText: '"DM Sans", system-ui, sans-serif' },
 };
 
 export const SEKTIONEN = [['countdown', 'Countdown'], ['termine', 'Termine'], ['buchen', 'Zusage'], ['momente', 'Momente von uns'], ['geschenk', 'Geschenke'], ['wissen', 'Gut zu wissen']];
-export const ELEMENTE = [['siegel', 'Drehendes Siegel am Foto'], ['lichtpunkte', 'Aufsteigende Lichtpunkte'], ['konfetti', 'Konfetti nach der Zusage']];
+export const ELEMENTE = [['siegel', 'Drehendes Siegel am Foto'], ['lichtpunkte', 'Aufsteigende Lichtpunkte'], ['laufband', 'Laufband mit Namen und Datum'], ['konfetti', 'Konfetti nach der Zusage']];
+const ELEMENT_STANDARD = { siegel: true, lichtpunkte: false, laufband: false, konfetti: true };
+export const STILE = [
+  ['sanft', 'Sanft', 'Weiche Karten und feine Linien'],
+  ['magazin', 'Magazin', 'Riesige Namen, Haarlinien, Nummern wie in einem Heft'],
+  ['retro', 'Retro', 'Kräftige Rahmen, harte Schatten, Wellenlinie unter den Titeln'],
+  ['polaroid', 'Polaroid', 'Fotos mit weißem Rahmen und Klebeband, leicht schief'],
+  ['fliesen', 'Fliesen', 'Doppelte Rahmen und ein Band aus Fliesenmuster'],
+];
 export const HEROS = [['bogen', 'Foto im Bogen'], ['vollbild', 'Foto als Hintergrund'], ['geteilt', 'Foto geteilt, rechts'], ['schlicht', 'Nur Schrift']];
 export const BLOCKTYPEN = [['text', 'Text mit Überschrift'], ['zitat', 'Zitat'], ['bild', 'Bild'], ['zweispaltig', 'Bild und Text'], ['knopf', 'Knopf mit Link'], ['trenner', 'Trenner']];
 
 /* ---- Vorlagen ---- */
-const alleAn = { countdown: true, siegel: true, lichtpunkte: true, konfetti: true };
+const alleAn = { countdown: true, siegel: true, lichtpunkte: false, laufband: false, konfetti: true };
 const rf = ['countdown', 'termine', 'buchen', 'momente', 'geschenk', 'wissen'];
-const v = (name, beschreibung, farben, schrift, rundung, knoepfe, hero, elemente = alleAn) => ({ name, beschreibung, design: { vorlage: null, farben, schrift, rundung, knoepfe, hero, elemente: { ...alleAn, ...elemente }, reihenfolge: rf, aus: [], bloecke: [], css: '', html_oben: '', html_unten: '' } });
+// Eine Vorlage ist: Farben, Schrift, Charakter (stil), Flächen, Textur, Rundung, Knöpfe, Anfang und Effekte
+const v = (name, beschreibung, farben, schrift, o) => ({ name, beschreibung, design: { vorlage: null, farben, schrift, stil: o.stil || 'sanft', flaechen: o.flaechen || 'bunt', textur: o.textur || 'keine', rundung: o.rundung || 'weich', knoepfe: o.knoepfe || 'pille', hero: o.hero || 'bogen', elemente: { ...alleAn, ...(o.elemente || {}) }, reihenfolge: rf, aus: [], bloecke: [], css: '', html_oben: '', html_unten: '' } });
 export const VORLAGEN = {
-  abendlicht: v('Abendlicht', 'Salbeigrün, Goldlinien und ein Foto im Bogen. Warm und festlich.', { akzent: '#3f5a4d', grund: '#faf9f6', text: '#25282b', gold: '#b88a45', licht: '#f4e3bf' }, 'klassisch', 'weich', 'pille', 'bogen'),
-  elfenbein: v('Elfenbein', 'Marineblau auf Elfenbein, klare Kanten, ganz klassisch.', { akzent: '#1f2a44', grund: '#fbf8f1', text: '#222831', gold: '#a8864e', licht: '#efe6d2' }, 'elegant', 'eckig', 'eckig', 'schlicht', { siegel: false, lichtpunkte: false }),
-  boho: v('Boho', 'Terrakotta und Sand, weiche Formen, Foto geteilt.', { akzent: '#9a4b2e', grund: '#f8f1e7', text: '#3a2e27', gold: '#c58b3d', licht: '#f2dcc0' }, 'boho', 'rund', 'pille', 'geteilt', { siegel: false }),
-  mitternacht: v('Mitternacht', 'Dunkles Blau mit warmem Gold. Für Feiern am Abend.', { akzent: '#e0c07a', grund: '#0f1b26', text: '#e9eef2', tief: '#08121b', gold: '#e0c07a', licht: '#2b3b4a' }, 'elegant', 'weich', 'pille', 'vollbild', { lichtpunkte: true }),
-  rose: v('Rosé Garten', 'Altrosa und Salbei, mit der Handschrift für die Namen.', { akzent: '#a85a62', grund: '#fbf4f2', text: '#3a2a2c', gold: '#b98a5a', licht: '#f6dfd8' }, 'schreib', 'weich', 'pille', 'bogen'),
-  kueste: v('Küste', 'Meerblau und Sand, großes Foto, modern.', { akzent: '#2b6f8a', grund: '#f6f9f9', text: '#1f2c33', gold: '#c9a96a', licht: '#e4eef0' }, 'modern', 'weich', 'pille', 'vollbild', { siegel: false }),
-  minimal: v('Minimal', 'Schwarz auf Weiß, nur Schrift und Linien.', { akzent: '#161616', grund: '#ffffff', text: '#161616', gold: '#161616', licht: '#f0f0f0' }, 'schlicht', 'eckig', 'eckig', 'schlicht', { siegel: false, lichtpunkte: false, konfetti: false }),
+  abendlicht: v('Abendlicht', 'Tiefes Salbeigrün auf warmem Cremeweiß, Goldlinien, Foto im Bogen. Feierlich und warm.',
+    { akzent: '#3d5a47', grund: '#f8f1e3', band: '#ecdfc4', text: '#2a2b26', gold: '#b4803a', licht: '#f2d9a6', tief: '#22372b' }, 'klassisch', { textur: 'papier', elemente: { siegel: true } }),
+  dolcevita: v('Dolce Vita', 'Butter, Tomatenrot und Pinienwald. Italienischer Sommer mit Laufband und kräftigen Rahmen.',
+    { akzent: '#d2402b', grund: '#fdf2cc', band: '#f7de86', text: '#3a1f14', gold: '#1f6a4c', licht: '#ffd9c9', tief: '#1f5a43' }, 'retro', { stil: 'retro', textur: 'papier', rundung: 'weich', hero: 'bogen', elemente: { laufband: true, siegel: true } }),
+  magazin: v('Magazin', 'Zeitungspapier, Tinte und ein Hauch Zinnober. Namen so groß wie auf einem Titelblatt.',
+    { akzent: '#161513', grund: '#f1ece1', band: '#e3dccb', text: '#161513', gold: '#c4472b', licht: '#f1ece1', tief: '#161513' }, 'magazin', { stil: 'magazin', textur: 'papier', rundung: 'eckig', knoepfe: 'eckig', hero: 'geteilt', elemente: { siegel: false, laufband: true, konfetti: false } }),
+  olivgarten: v('Olivgarten', 'Olive, Salbei und Sonnengold. Runde Formen, weich und wild wie ein Gartenfest.',
+    { akzent: '#55683a', grund: '#f5f1e1', band: '#dde4c4', text: '#263020', gold: '#b9862f', licht: '#f1e2b0', tief: '#34441f' }, 'boho', { textur: 'papier', rundung: 'rund', hero: 'bogen', elemente: { siegel: true } }),
+  mitternacht: v('Mitternacht', 'Nachtblau, Gold und aufsteigende Sterne. Das einzige Design mit Lichtpunkten.',
+    { akzent: '#e3c27c', grund: '#0f1b27', band: '#172838', text: '#eaeef2', gold: '#e3c27c', licht: '#31465a', tief: '#08121b' }, 'elegant', { textur: 'papier', hero: 'vollbild', elemente: { siegel: true, lichtpunkte: true } }),
+  polaroid: v('Polaroid', 'Blush, Weinrot und ein Album voller Schnappschüsse mit Klebeband. Persönlich und handgeschrieben.',
+    { akzent: '#9c4558', grund: '#fbeee9', band: '#f2d6d0', text: '#3b2427', gold: '#c08a5b', licht: '#f8dccf', tief: '#5b2a36' }, 'hand', { stil: 'polaroid', textur: 'papier', rundung: 'weich', hero: 'bogen', elemente: { siegel: false } }),
+  azul: v('Azul', 'Kobaltblau, Cremeweiß und Sonnengelb. Fliesenmuster und doppelte Rahmen wie am Mittelmeer.',
+    { akzent: '#1d4fa3', grund: '#f7f3e7', band: '#d3e1f4', text: '#12254a', gold: '#e8ae2c', licht: '#d3e1f4', tief: '#0d2d66' }, 'modern', { stil: 'fliesen', textur: 'keine', rundung: 'eckig', knoepfe: 'eckig', hero: 'geteilt', elemente: { siegel: false, konfetti: true } }),
 };
 for (const [id, vl] of Object.entries(VORLAGEN)) vl.design.vorlage = id;
 
@@ -55,6 +79,9 @@ export function bereinigen(eingabe) {
     vorlage: VORLAGEN[e.vorlage] ? e.vorlage : 'eigene',
     farben: {},
     schrift: SCHRIFTEN[e.schrift] ? e.schrift : basis.schrift,
+    stil: STILE.some(([k]) => k === e.stil) ? e.stil : 'sanft',
+    flaechen: ['ruhig', 'bunt'].includes(e.flaechen) ? e.flaechen : 'ruhig',
+    textur: ['keine', 'papier'].includes(e.textur) ? e.textur : 'keine',
     rundung: ['eckig', 'weich', 'rund'].includes(e.rundung) ? e.rundung : basis.rundung,
     knoepfe: ['pille', 'eckig'].includes(e.knoepfe) ? e.knoepfe : basis.knoepfe,
     hero: HEROS.some(([k]) => k === e.hero) ? e.hero : basis.hero,
@@ -66,12 +93,12 @@ export function bereinigen(eingabe) {
     html_oben: kurz(e.html_oben, 30000),
     html_unten: kurz(e.html_unten, 30000),
   };
-  for (const k of ['akzent', 'grund', 'text', 'tief', 'gold', 'licht']) {
+  for (const k of ['akzent', 'grund', 'text', 'tief', 'gold', 'licht', 'band']) {
     const w = e.farben?.[k];
     if (HEX.test(w)) aus.farben[k] = w.toLowerCase();
-    else if (!['tief'].includes(k)) aus.farben[k] = basis.farben[k] || '';
+    else if (!['tief', 'band'].includes(k)) aus.farben[k] = basis.farben[k] || '';
   }
-  for (const [k] of ELEMENTE) aus.elemente[k] = e.elemente ? e.elemente[k] !== false : true;
+  for (const [k] of ELEMENTE) aus.elemente[k] = e.elemente && typeof e.elemente[k] === 'boolean' ? e.elemente[k] : ELEMENT_STANDARD[k];
   aus.elemente.countdown = e.elemente ? e.elemente.countdown !== false : true;
   const ids = SEKTIONEN.map(([k]) => k);
   const gewuenscht = Array.isArray(e.reihenfolge) ? e.reihenfolge.filter((k) => ids.includes(k)) : [];
@@ -118,7 +145,7 @@ export function cssVon(design) {
   }
   z.push(`--farbe-akzent:${fa.akzent}`, `--farbe-akzent-dunkel:${mischen(fa.akzent, dunkel ? '#ffffff' : '#000000', dunkel ? 0.2 : 0.25)}`, `--farbe-akzent-hell:${mischen(fa.akzent, fa.grund, 0.88)}`);
   z.push(`--farbe-grund:${fa.grund}`, `--farbe-text:${fa.text}`, `--farbe-text-weich:${mischen(fa.text, fa.grund, 0.32)}`);
-  z.push(`--farbe-band:${mischen(fa.grund, fa.text, dunkel ? 0.08 : 0.06)}`, `--farbe-linie:${mischen(fa.grund, fa.text, dunkel ? 0.16 : 0.12)}`, `--farbe-flaeche:${dunkel ? mischen(fa.grund, '#ffffff', 0.06) : mischen(fa.grund, '#ffffff', 0.7)}`);
+  z.push(`--farbe-band:${fa.band || mischen(fa.grund, fa.text, dunkel ? 0.08 : 0.06)}`, `--farbe-linie:${mischen(fa.grund, fa.text, dunkel ? 0.16 : 0.12)}`, `--farbe-flaeche:${dunkel ? mischen(fa.grund, '#ffffff', 0.06) : mischen(fa.grund, '#ffffff', 0.7)}`);
   z.push(`--farbe-tief:${fa.tief || (dunkel ? mischen(fa.grund, '#000000', 0.35) : mischen(fa.akzent, '#0b120e', 0.3))}`, `--farbe-gold:${fa.gold}`, `--farbe-licht:${fa.licht}`);
   z.push(`--farbe-auf-akzent:${hell(fa.akzent) > 0.5 ? '#161616' : '#ffffff'}`);
   z.push(`--schrift-titel:${schrift.stapelTitel}`, `--schrift-text:${schrift.stapelText}`, `--schrift-name:${schrift.stapelName || schrift.stapelTitel}`, `--name-abstand:${schrift.namenSchrift ? '0' : '-.02em'}`);
@@ -139,7 +166,8 @@ export function cssVon(design) {
 // Attribute am <html>, mit denen style.css die Varianten schaltet
 export function htmlAttribute(d) {
   const aus = [...Object.entries(d.elemente).filter(([, an]) => !an).map(([k]) => k)];
-  return ` data-hero="${esc(d.hero)}" data-knoepfe="${esc(d.knoepfe)}" data-rundung="${esc(d.rundung)}" data-aus="${esc(aus.join(' '))}"`;
+  const dunkel = hell(d.farben.grund) < 0.3 ? ' data-dunkel' : '';
+  return ` data-hero="${esc(d.hero)}" data-knoepfe="${esc(d.knoepfe)}" data-rundung="${esc(d.rundung)}" data-stil="${esc(d.stil)}" data-flaechen="${esc(d.flaechen)}" data-textur="${esc(d.textur)}" data-aus="${esc(aus.join(' '))}"${dunkel}`;
 }
 
 /* ---- Eigene Blöcke ---- */
@@ -181,8 +209,16 @@ export function cssSaeubern(css) {
     .replace(/url\(\s*(['"]?)\s*(https?:|\/\/|javascript:|data:(?!image\/))[^)]*\)/gi, 'none');
 }
 
+// Laufband unter dem Anfang: Namen, Datum und Ort im Wechsel mit einer kleinen Raute
+export function laufbandHtml(d, teile) {
+  const t = (teile || []).filter(Boolean);
+  if (!d.elemente.laufband || !t.length) return '';
+  const einheit = `<span>${t.map(esc).join('<i></i>')}<i></i></span>`;
+  return `<div class="laufband" aria-hidden="true" style="order:1"><div class="laufband-spur">${einheit.repeat(8)}</div></div>`;
+}
+
 // Alles, was seiten.js für eine Seite braucht
-export function aufbereiten(design) {
+export function aufbereiten(design, laufbandTexte) {
   const d = bereinigen(design);
   return {
     design: d,
@@ -190,6 +226,7 @@ export function aufbereiten(design) {
     proCss: cssSaeubern(d.css),
     attribute: htmlAttribute(d),
     bloecke: bloeckeHtml(d),
+    laufband: laufbandHtml(d, laufbandTexte),
     oben: htmlSaeubern(d.html_oben),
     unten: htmlSaeubern(d.html_unten),
   };

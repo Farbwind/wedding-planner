@@ -754,3 +754,7 @@ textarea.code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size
 @media (max-width: 1100px) { .dsg { grid-template-columns: minmax(0, 1fr); } .dsg-vorschau, .dsg-kopf { position: static; } .dsg-rahmen iframe { height: 560px; } }
 @media (max-width: 520px) { .dsg-vorlagen, .dsg-schriften { grid-template-columns: minmax(0, 1fr); } }
 .knopf:disabled { opacity: .45; cursor: default; box-shadow: none; pointer-events: none; }
+@font-face { font-family: "Instrument Serif"; src: url(/fonts/instrument-serif-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Young Serif"; src: url(/fonts/young-serif-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Bricolage Grotesque"; src: url(/fonts/bricolage-grotesque-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Caveat"; src: url(/fonts/caveat-latin-700-normal.woff2) format("woff2"); font-weight: 700; font-display: swap; }

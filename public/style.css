@@ -151,7 +151,7 @@ svg { width: 1.2em; height: 1.2em; flex: none; }
 }
 
 /* Countdown */
-.countdown { position: relative; overflow: hidden; background: linear-gradient(115deg, var(--farbe-tief), color-mix(in srgb, var(--farbe-akzent) 82%, #000) 55%, var(--farbe-tief)) 0 0 / 220% 100%;
+.countdown { position: relative; overflow: hidden; background: linear-gradient(115deg, var(--farbe-tief), color-mix(in srgb, var(--farbe-tief) 76%, var(--farbe-akzent)) 55%, var(--farbe-tief)) 0 0 / 220% 100%;
   color: #fff; text-align: center; padding: clamp(36px, 6vw, 64px) clamp(16px, 4vw, 32px); }
 .countdown-vor { margin: 0 0 14px; text-transform: uppercase; letter-spacing: .26em; font-size: .8rem; font-weight: 600; color: color-mix(in srgb, var(--farbe-licht) 85%, #fff); }
 .countdown-zahlen { display: flex; justify-content: center; gap: clamp(14px, 4.5vw, 64px); }
@@ -466,3 +466,120 @@ html[data-hero="vollbild"] .hero-inhalt.mit-foto { grid-template-columns: 1fr; }
 .block-knopf h2::after { margin-inline: auto; }
 .bl-trenner { display: grid; place-items: center; padding: 8px 0; }
 .bl-trenner span { width: min(220px, 50%); height: 2px; background: linear-gradient(90deg, transparent, var(--farbe-gold), transparent); }
+
+/* ---- Flächen, Textur und Laufband (Designer) ---- */
+/* Bunte Flächen: Termine und „Gut zu wissen“ auf der Flächenfarbe, Geschenke in der Hauptfarbe, bis zum Rand */
+html[data-flaechen="bunt"] .termine, html[data-flaechen="bunt"] .wissen { background: var(--farbe-band); box-shadow: 0 0 0 100vmax var(--farbe-band); clip-path: inset(0 -100vmax); }
+html[data-flaechen="bunt"] .geschenk { background: var(--farbe-akzent); box-shadow: 0 0 0 100vmax var(--farbe-akzent); clip-path: inset(0 -100vmax); }
+html[data-flaechen="bunt"] .geschenk > h2, html[data-flaechen="bunt"] .geschenk p { color: var(--farbe-auf-akzent); }
+html[data-flaechen="bunt"] .geschenk > h2::after { background: currentColor; }
+html[data-flaechen="bunt"] .buchen::before, html[data-flaechen="bunt"] .buchen::after { display: none; }
+html[data-flaechen="bunt"] .buchen { padding-block: clamp(64px, 9vw, 112px); }
+html[data-flaechen="bunt"] .hero { background: radial-gradient(52rem 34rem at 88% -8%, color-mix(in srgb, var(--farbe-licht) 80%, transparent), transparent 62%), radial-gradient(46rem 32rem at -8% 108%, color-mix(in srgb, var(--farbe-band) 70%, transparent), transparent 64%), var(--farbe-grund); }
+
+/* Papier: feines Korn über der ganzen Seite */
+html[data-textur="papier"]::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .42;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+html[data-textur="papier"][data-dunkel]::after { filter: invert(1); opacity: .09; }
+@media print { html[data-textur="papier"]::after { display: none; } }
+
+/* Laufband mit Namen und Datum */
+.laufband { overflow: hidden; background: var(--farbe-akzent); color: var(--farbe-auf-akzent); padding: 15px 0; white-space: nowrap; font: 500 clamp(1.05rem, 2.6vw, 1.5rem)/1 var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase; }
+.laufband-spur { display: flex; width: max-content; }
+.laufband span { display: inline-flex; align-items: center; gap: 1.4em; padding-right: 1.4em; }
+.laufband i { width: .5em; height: .5em; background: var(--farbe-gold); transform: rotate(45deg); flex: none; }
+@media (prefers-reduced-motion: no-preference) { .laufband-spur { animation: laufband 46s linear infinite; } .laufband:hover .laufband-spur { animation-play-state: paused; } }
+@keyframes laufband { to { transform: translateX(-50%); } }
+
+/* ---- Charakter: Magazin ---- */
+html[data-stil="magazin"] .namen { font-size: clamp(4.8rem, 19vw, 14rem); line-height: .78; letter-spacing: -.045em; margin-bottom: 34px; }
+html[data-stil="magazin"] .namen .und { font-size: .46em; color: var(--farbe-gold); }
+html[data-stil="magazin"] .hero-vorspann { border: 0; padding: 0; display: inline-flex; align-items: center; gap: 14px; color: var(--farbe-text); letter-spacing: .3em; }
+html[data-stil="magazin"] .hero-vorspann::before { content: ""; width: 44px; height: 1px; background: currentColor; }
+html[data-stil="magazin"] .hero-datum { font: 600 clamp(.95rem, 2vw, 1.15rem)/1.3 var(--schrift-text); letter-spacing: .26em; text-transform: uppercase; }
+html[data-stil="magazin"] .termine > h2, html[data-stil="magazin"] .momente > h2, html[data-stil="magazin"] .wissen > h2, html[data-stil="magazin"] .geschenk > h2 { border-top: 1px solid currentColor; padding-top: .35em; font-size: clamp(3.2rem, 10vw, 7rem); letter-spacing: -.03em; }
+html[data-stil="magazin"] .termine > h2::after, html[data-stil="magazin"] .momente > h2::after, html[data-stil="magazin"] .wissen > h2::after, html[data-stil="magazin"] .geschenk > h2::after { display: none; }
+html[data-stil="magazin"] .termine > h2::before, html[data-stil="magazin"] .momente > h2::before, html[data-stil="magazin"] .wissen > h2::before, html[data-stil="magazin"] .geschenk > h2::before { display: block; margin-bottom: 1.2rem; font: 600 .78rem/1 var(--schrift-text); letter-spacing: .26em; color: var(--farbe-gold); }
+html[data-stil="magazin"] .termine > h2::before { content: "01"; }
+html[data-stil="magazin"] .momente > h2::before { content: "02"; }
+html[data-stil="magazin"] .geschenk > h2::before { content: "03"; }
+html[data-stil="magazin"] .wissen > h2::before { content: "04"; }
+html[data-stil="magazin"] .geschenk > h2::before { color: currentColor; opacity: .7; }
+html[data-stil="magazin"] .termin, html[data-stil="magazin"] .wissen dl > div { background: transparent; border: 0; border-top: 3px solid var(--farbe-text); border-radius: 0; padding-inline: 0; box-shadow: none; }
+html[data-stil="magazin"] .termin::before { display: none; }
+html[data-stil="magazin"] .termin:hover, html[data-stil="magazin"] .wissen dl > div:hover { transform: none; box-shadow: none; }
+html[data-stil="magazin"] .knopf, html[data-stil="magazin"] .knopf-leise { text-transform: uppercase; letter-spacing: .14em; font-size: .82rem; padding: 16px 28px; }
+html[data-stil="magazin"] .laufband { background: var(--farbe-text); color: var(--farbe-grund); font-family: var(--schrift-text); font-weight: 600; font-size: clamp(.85rem, 2vw, 1.05rem); letter-spacing: .24em; }
+html[data-stil="magazin"][data-hero="bogen"] .hero-bild img { border-radius: 0; aspect-ratio: 3 / 4; }
+html[data-stil="magazin"] .countdown-zahlen b { font-weight: 400; }
+html[data-stil="magazin"] .fuss-namen { font-style: normal; text-transform: uppercase; letter-spacing: -.02em; }
+
+/* ---- Charakter: Retro ---- */
+html[data-stil="retro"] .knopf, html[data-stil="retro"] .knopf-leise, html[data-stil="retro"] .hauptmenue .kopf-knopf, html[data-stil="retro"] .menue-knopf { border: 2.5px solid var(--farbe-text); box-shadow: 4px 4px 0 var(--farbe-text); transition: transform .12s, box-shadow .12s, background-color .2s; }
+html[data-stil="retro"] .knopf-leise, html[data-stil="retro"] .menue-knopf { background: var(--farbe-flaeche); color: var(--farbe-text); }
+html[data-stil="retro"] .knopf:hover, html[data-stil="retro"] .knopf-leise:hover, html[data-stil="retro"] .hauptmenue .kopf-knopf:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--farbe-text); }
+html[data-stil="retro"] .knopf:active, html[data-stil="retro"] .knopf-leise:active, html[data-stil="retro"] .hauptmenue .kopf-knopf:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--farbe-text); }
+html[data-stil="retro"] .knopf:hover { background: var(--farbe-akzent); }
+html[data-stil="retro"] .buchen .knopf { border-color: var(--farbe-text); }
+html[data-stil="retro"] .termin, html[data-stil="retro"] .wissen dl > div { border: 2.5px solid var(--farbe-text); box-shadow: 6px 6px 0 var(--farbe-text); }
+html[data-stil="retro"] .termin::before { display: none; }
+html[data-stil="retro"] .termin:hover, html[data-stil="retro"] .wissen dl > div:hover { transform: translate(-2px, -2px); box-shadow: 9px 9px 0 var(--farbe-text); }
+html[data-stil="retro"] .buchung, html[data-stil="retro"] .bestaetigung-karte { border: 2.5px solid var(--farbe-text); box-shadow: 8px 8px 0 var(--farbe-licht); }
+html[data-stil="retro"] h2, html[data-stil="retro"] .seitenkopf h1 { color: var(--farbe-text); text-decoration: underline wavy var(--farbe-akzent); text-decoration-thickness: 3px; text-underline-offset: .14em; text-decoration-skip-ink: none; }
+html[data-stil="retro"] .buchen > h2 { color: #fff; text-decoration-color: var(--farbe-licht); }
+html[data-stil="retro"][data-flaechen="bunt"] .geschenk > h2 { text-decoration-color: currentColor; }
+html[data-stil="retro"] .termine > h2::after, html[data-stil="retro"] .momente > h2::after, html[data-stil="retro"] .wissen > h2::after, html[data-stil="retro"] .geschenk > h2::after, html[data-stil="retro"] .block h2::after, html[data-stil="retro"] .seitenkopf h1::after { display: none; }
+html[data-stil="retro"] .namen .name { color: var(--farbe-akzent); }
+html[data-stil="retro"] .namen .und { color: var(--farbe-gold); }
+html[data-stil="retro"] .hero-vorspann { background: var(--farbe-tief); color: #fff; border: 0; transform: rotate(-2deg); padding: 9px 18px; }
+html[data-stil="retro"] .moment-foto { border: 2.5px solid var(--farbe-text); border-radius: 18px; box-shadow: 6px 6px 0 var(--farbe-text); }
+html[data-stil="retro"][data-hero="bogen"] .hero-bild img { border: 3px solid var(--farbe-text); box-shadow: none; }
+html[data-stil="retro"][data-hero="bogen"] .hero-bild::before { border: 3px solid var(--farbe-text); background: var(--farbe-band); transform: translate(14px, 14px); }
+html[data-stil="retro"] .laufband { background: var(--farbe-tief); color: #fff; border-block: 3px solid var(--farbe-text); }
+html[data-stil="retro"] .countdown-zahlen b { font-weight: 400; }
+
+/* ---- Charakter: Polaroid ---- */
+html[data-stil="polaroid"] .moment-foto { overflow: visible; padding: 10px 10px 40px; background: var(--farbe-flaeche); border-radius: 3px; box-shadow: 0 16px 30px -16px rgba(0, 0, 0, .45), 0 2px 4px rgba(0, 0, 0, .08); transition: rotate .35s, transform .35s; }
+html[data-stil="polaroid"] .moment-foto img { border-radius: 1px; }
+html[data-stil="polaroid"] .moment-foto:nth-child(odd) { rotate: -1.6deg; }
+html[data-stil="polaroid"] .moment-foto:nth-child(even) { rotate: 1.3deg; }
+html[data-stil="polaroid"] .moment-foto:nth-child(3n) { rotate: -.5deg; }
+html[data-stil="polaroid"] .moment-foto:hover { rotate: 0deg; transform: translateY(-4px) scale(1.02); z-index: 2; }
+html[data-stil="polaroid"][data-hero="bogen"] .hero-bild::before, html[data-stil="polaroid"] .moment-foto::before, html[data-stil="polaroid"] .termin::before, html[data-stil="polaroid"] .wissen dl > div::before { content: ""; position: absolute; z-index: 2; top: -12px; left: 50%; right: auto; bottom: auto; width: 88px; height: 26px; translate: -50% 0; rotate: -4deg; border: 0; border-radius: 0; transform: none; transition: none;
+  background: color-mix(in srgb, var(--farbe-licht) 78%, transparent); box-shadow: 0 1px 2px rgba(0, 0, 0, .14); }
+html[data-stil="polaroid"] .moment-foto figcaption { inset: auto 8px 8px; padding: 0; background: none; backdrop-filter: none; text-align: center; font: 700 1.3rem/1 var(--schrift-name); }
+html[data-stil="polaroid"] .termin, html[data-stil="polaroid"] .wissen dl > div { position: relative; overflow: visible; border: 0; border-radius: 4px; box-shadow: 0 18px 32px -18px rgba(0, 0, 0, .4); background: var(--farbe-flaeche); }
+html[data-stil="polaroid"] .termin:nth-child(odd), html[data-stil="polaroid"] .wissen dl > div:nth-child(odd) { rotate: -.7deg; }
+html[data-stil="polaroid"] .termin:nth-child(even), html[data-stil="polaroid"] .wissen dl > div:nth-child(even) { rotate: .6deg; }
+html[data-stil="polaroid"] .termin:hover, html[data-stil="polaroid"] .wissen dl > div:hover { rotate: 0deg; transform: translateY(-3px); }
+html[data-stil="polaroid"] .termin:hover::before { transform: none; }
+html[data-stil="polaroid"] .wissen dl > div { position: relative; }
+html[data-stil="polaroid"][data-hero="bogen"] .hero-bild img { border-radius: 3px; aspect-ratio: 4 / 5; border: 14px solid var(--farbe-flaeche); border-bottom-width: 66px; box-shadow: 0 30px 50px -22px rgba(0, 0, 0, .5); rotate: -2.5deg; }
+html[data-stil="polaroid"][data-hero="bogen"] .hero-bild::before { top: -12px; width: 120px; height: 30px; }
+html[data-stil="polaroid"] .namen { font-weight: 700; line-height: .92; }
+html[data-stil="polaroid"] .namen .und { font-style: normal; font-weight: 700; }
+html[data-stil="polaroid"] .hero-vorspann { font-family: var(--schrift-name); font-size: 1.5rem; letter-spacing: .02em; text-transform: none; border-style: dashed; }
+html[data-stil="polaroid"] .laufband { font-family: var(--schrift-name); font-size: clamp(1.4rem, 3vw, 2rem); text-transform: none; letter-spacing: .02em; font-weight: 700; }
+
+/* ---- Charakter: Fliesen ---- */
+html[data-stil="fliesen"] .hero::after, html[data-stil="fliesen"] .fuss::before { content: ""; position: absolute; left: 0; right: 0; height: 26px; z-index: 1;
+  background-color: var(--farbe-gold);
+  background-image: linear-gradient(135deg, var(--farbe-akzent) 25%, transparent 25%), linear-gradient(225deg, var(--farbe-akzent) 25%, transparent 25%), linear-gradient(315deg, var(--farbe-akzent) 25%, transparent 25%), linear-gradient(45deg, var(--farbe-akzent) 25%, transparent 25%);
+  background-size: 26px 26px; background-position: -13px 0, -13px 0, 0 0, 0 0; }
+html[data-stil="fliesen"] .hero::after { bottom: 0; }
+html[data-stil="fliesen"] .fuss::before { top: 0; }
+html[data-stil="fliesen"] .fuss { padding-top: calc(clamp(56px, 9vw, 96px) + 26px); }
+html[data-stil="fliesen"] .termin, html[data-stil="fliesen"] .wissen dl > div, html[data-stil="fliesen"] .buchung { border: 2px solid var(--farbe-akzent); border-radius: 0; box-shadow: inset 0 0 0 6px var(--farbe-flaeche), inset 0 0 0 8px color-mix(in srgb, var(--farbe-akzent) 45%, transparent); }
+html[data-stil="fliesen"] .buchung { border-color: var(--farbe-gold); }
+html[data-stil="fliesen"] .termin::before { display: none; }
+html[data-stil="fliesen"] .termin:hover, html[data-stil="fliesen"] .wissen dl > div:hover { transform: none; }
+html[data-stil="fliesen"] .knopf { box-shadow: 4px 4px 0 var(--farbe-gold); }
+html[data-stil="fliesen"] .knopf:hover { box-shadow: 6px 6px 0 var(--farbe-gold); }
+html[data-stil="fliesen"] .namen .und { color: var(--farbe-gold); }
+html[data-stil="fliesen"] .termine > h2::after, html[data-stil="fliesen"] .momente > h2::after, html[data-stil="fliesen"] .wissen > h2::after, html[data-stil="fliesen"] .geschenk > h2::after { height: 12px; width: 132px; background: repeating-linear-gradient(90deg, var(--farbe-gold) 0 12px, transparent 12px 24px); }
+html[data-stil="fliesen"][data-flaechen="bunt"] .geschenk > h2::after { background: repeating-linear-gradient(90deg, currentColor 0 12px, transparent 12px 24px); }
+html[data-stil="fliesen"] .moment-foto { padding: 6px; background: var(--farbe-flaeche); border: 2px solid var(--farbe-akzent); border-radius: 0; }
+html[data-stil="fliesen"] .moment-foto img { border-radius: 0; }
+html[data-stil="fliesen"][data-hero="bogen"] .hero-bild img { border-radius: 0; aspect-ratio: 4 / 5; border: 3px solid var(--farbe-akzent); padding: 10px; background: var(--farbe-flaeche); }
+html[data-stil="fliesen"][data-hero="bogen"] .hero-bild::before { border-radius: 0; border-color: var(--farbe-gold); }
+html[data-stil="fliesen"] .laufband { background: var(--farbe-akzent); }
