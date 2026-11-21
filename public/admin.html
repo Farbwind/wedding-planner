@@ -136,6 +136,34 @@
     </section>
 
     <section data-bereich="sitzplan" hidden>
+      <div class="leiste ansicht-wahl">
+        <div class="filter" role="group" aria-label="Ansicht des Sitzplans">
+          <button type="button" data-sitz-ansicht="liste" aria-pressed="true">Liste</button>
+          <button type="button" data-sitz-ansicht="raum" aria-pressed="false">Raumplan</button>
+        </div>
+      </div>
+      <div id="raumplan" class="raumplan" hidden>
+        <div class="leiste rp-leiste">
+          <button type="button" class="knopf leise" data-rp-neu="rund">Runder Tisch</button>
+          <button type="button" class="knopf leise" data-rp-neu="rechteck">Rechteckiger Tisch</button>
+          <button type="button" class="knopf leise" data-rp-neu="lang">Lange Tafel</button>
+          <button type="button" class="knopf leise" data-rp-neu="oval">Ovaler Tisch</button>
+          <select id="rp-objekt" aria-label="Objekt hinzufügen"><option value="">Objekt hinzufügen …</option><option>Bühne</option><option>Tanzfläche</option><option>Buffet</option><option>Bar</option><option>DJ</option><option>Eingang</option><option>Torte</option><option>Fotoecke</option></select>
+          <button type="button" class="knopf leise" id="rp-ordnen">Neu anordnen</button>
+          <button type="button" class="knopf leise" id="rp-bild">Als Bild laden</button>
+          <button type="button" class="knopf leise" id="rp-drucken">Drucken</button>
+        </div>
+        <p class="hilfe">Tische und Objekte per Ziehen verschieben, anklicken zum Drehen, Vergrößern und Ändern der Plätze. Gäste aus der Liste links auf einen Tisch ziehen, ein Platz mit Gast lässt sich auf einen anderen Tisch ziehen. Roter Rand: mehr Gäste als Plätze. Grüner Rand am Platz: vegan, gelbgrün: vegetarisch.</p>
+        <div class="rp-layout">
+          <aside class="rp-pool pool" aria-label="Gäste ohne Platz">
+            <h2>Ohne Platz <span id="rp-pool-anzahl"></span></h2>
+            <input type="search" id="rp-suche" placeholder="Gast suchen" aria-label="Gast suchen">
+            <div id="rp-pool-liste"></div>
+          </aside>
+          <div class="rp-buehne"><svg id="rp-flaeche" viewBox="0 0 1200 760" role="img" aria-label="Raumplan mit Tischen"></svg></div>
+          <aside class="rp-panel block" id="rp-panel" aria-live="polite"></aside>
+        </div>
+      </div>
       <div class="leiste sitz-leiste">
         <div class="filter" role="group" aria-label="Gruppieren nach">
           <button type="button" data-gruppierung="haushalt" aria-pressed="true">Nach Antwort</button>
@@ -473,6 +501,7 @@
 <script src="/admin.js" type="module"></script>
 <script src="/js/admin-inhalte.js" type="module"></script>
 <script src="/js/admin-sitzplan.js" type="module"></script>
+<script src="/js/admin-raumplan.js" type="module"></script>
 <script src="/js/admin-planung.js" type="module"></script>
 <script src="/js/admin-fotos.js" type="module"></script>
 <script src="/js/admin-ablauf.js" type="module"></script>

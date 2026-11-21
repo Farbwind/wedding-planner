@@ -107,17 +107,9 @@
           <p class="feld-hilfe" data-feld="max-hinweis"></p>
         </div>
 
-        <div class="nur-ja feld breit" data-feld="mitreisende-feld" hidden>
-          <label for="companions">Wer kommt noch mit?</label>
-          <textarea id="companions" name="companions" rows="2" maxlength="600" placeholder="Namen aller, die mitkommen"></textarea>
-        </div>
-
-        <div class="nur-ja feld breit essen" role="group" aria-labelledby="essen-titel" hidden>
-          <span class="label" id="essen-titel">Essenswunsch <small>freiwillig</small></span>
-          <div class="menue-wahl">
-            <label class="chip"><input type="checkbox" name="vegetarian"><span>Vegetarisch</span></label>
-            <label class="chip"><input type="checkbox" name="vegan"><span>Vegan</span></label>
-          </div>
+        <div class="nur-ja feld breit" data-feld="personen-feld" role="group" aria-labelledby="personen-titel" hidden>
+          <span class="label" id="personen-titel">Wer kommt? <small>Essenswunsch und Unverträglichkeiten, freiwillig</small></span>
+          <ol class="personen-liste" data-feld="personen-liste"></ol>
         </div>
 
         <div class="nur-ja feld breit" data-feld="song-feld" hidden>

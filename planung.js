@@ -1,6 +1,8 @@
 // Hochzeitsplanung in der Verwaltung: Einladungsliste, To-dos, Kosten und Geschenke.
 // Wird von server.js eingebunden: const behandlePlanung = planung({...}); if (await behandlePlanung(req, res, url)) return;
 
+import { kostZahlen } from './essen.js';
+
 export const GAST_KATEGORIEN = ['Familie', 'Freunde', 'Kollegen', 'Bekannte'];
 export const KATEGORIEN = ['Location', 'Essen', 'Trinken', 'Personal', 'Dienstleister', 'Kleidung', 'Deko', 'Papeterie', 'Sonstiges'];
 
@@ -116,8 +118,8 @@ CREATE TABLE IF NOT EXISTS vorlagen (name TEXT PRIMARY KEY);
         standesamt: { eingeladen: gaeste.filter((g) => g.standesamt).length, ja: zaehle('s', 'ja'), nein: zaehle('s', 'nein') },
         hochzeit: { eingeladen: gaeste.filter((g) => g.hochzeit).length, ja: zaehle('h', 'ja'), nein: zaehle('h', 'nein') },
         personenZugesagt: ja.reduce((a, r) => a + r.persons, 0),
-        vegetarisch: ja.filter((r) => r.vegetarian).length,
-        vegan: ja.filter((r) => r.vegan).length,
+        vegetarisch: kostZahlen(antworten).vegetarisch,
+        vegan: kostZahlen(antworten).vegan,
         versendet: gaeste.filter((g) => g.versendet).length,
         kategorien: Object.fromEntries([...GAST_KATEGORIEN, ''].map((k) => [k || 'Ohne Kategorie', gaeste.filter((g) => g.kategorie === k).length])),
       },

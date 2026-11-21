@@ -82,6 +82,8 @@ Die Bilder zeigen Beispieldaten, das Paar auf dem Titelbild und alle Galeriefoto
 - To-do-Liste mit Beispiel-Checkliste, die sich nach eurem Hochzeitsdatum richtet
 - Kosten mit Diagramm, Kosten pro Gast und Geschenke
 - Fotos, Geschichte und Quiz pflegen, QR-Code für die Einladung
+- **Essenswunsch pro Person:** Bei der Zusage steht für jede Person eine Zeile mit Name, Essenswunsch (alles, vegetarisch, vegan) und einem Hinweis zu Allergien. Die Zählungen, der Sitzplan, die Tabelle und die Links für Dienstleister zählen Personen
+- **Raumplan:** Tische frei auf einer Fläche platzieren: runde, rechteckige und ovale Tische und lange Tafeln, dazu Bühne, Tanzfläche, Buffet, Bar, DJ, Eingang, Torte und Fotoecke. Per Ziehen verschieben, drehen, vergrößern, Plätze ändern, Gäste per Ziehen an den Tisch setzen, als Bild laden oder drucken
 - **Ablauf und Dienstleister:** Programm des Tages mit Uhrzeit, Ort und Zuständigen pflegen, interne Punkte bleiben unter euch. Pro Dienstleister (Catering, DJ, Location, Fotografie) ein eigener Link, der nur zeigt, was ihr freigebt: Ablauf, Gästezahlen und Essenswünsche, Songwünsche, Sitzplan. Nur lesbar, immer aktuell, jederzeit sperrbar oder erneuerbar
 - **Songwünsche und Beiträge:** Gäste können bei der Zusage einen Song wünschen und anmelden, dass sie etwas beitragen möchten. Beides als Liste einsehbar und als Tabelle ladbar, in den Angaben abschaltbar
 - **Gästefotos:** Abschnitte mit Datum und Uhrzeit, eigener QR-Code und Druckvorlage zum Aufstellen pro Abschnitt, Galerie zum Verschieben, Verbergen und Löschen, Download als ZIP

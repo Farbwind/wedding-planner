@@ -226,6 +226,15 @@ textarea { resize: vertical; }
 .absenden { width: 100%; }
 .hinweis-datenschutz { margin: 0; text-align: center; font-size: .9rem; color: var(--farbe-text-weich); }
 
+/* Personen mit Essenswunsch */
+.personen-liste { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.person-zeile { display: grid; gap: 8px; padding: 12px; border: 1.5px solid var(--farbe-linie); border-radius: 14px; background: color-mix(in srgb, var(--farbe-grund) 55%, #fff); }
+.person-kopf { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(120px, 160px); gap: 10px; align-items: center; }
+.person-nr { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--farbe-akzent-hell); color: var(--farbe-akzent-dunkel); font-weight: 600; font-size: .9rem; }
+.person-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.person-zeile input, .person-zeile select { padding: 10px 12px; }
+@media (max-width: 520px) { .person-kopf { grid-template-columns: auto minmax(0, 1fr); } .person-kopf select { grid-column: 1 / -1; } }
+
 /* Bestätigung nach dem Absenden */
 .bestaetigung { margin-top: 28px; text-align: center; }
 .bestaetigung:focus { outline: none; }

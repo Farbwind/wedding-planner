@@ -12,8 +12,9 @@ import { seitenGeruest } from './seiten.js';
 import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 import { ablauf } from './ablauf.js';
+import { personenVon, kostZahlen, bereinigen } from './essen.js';
 
-const VERSION = '1.7.1';
+const VERSION = '1.9.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -60,6 +61,8 @@ if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = 'toke
 for (const spalte of ['vegetarian', 'vegan'])
   if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = ?").get(spalte))
     db.exec(`ALTER TABLE responses ADD COLUMN ${spalte} INTEGER NOT NULL DEFAULT 0`);
+// Personenliste mit Essenswunsch je Person (seit 1.8.0), JSON
+if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = 'personen'").get()) db.exec("ALTER TABLE responses ADD COLUMN personen TEXT NOT NULL DEFAULT ''");
 // Songwunsch und Beitrag der Gäste (seit 1.5.0), freiwillig
 for (const spalte of ['song', 'beitrag'])
   if (!db.prepare("SELECT 1 FROM pragma_table_info('responses') WHERE name = ?").get(spalte))
@@ -442,7 +445,7 @@ function publicInfo(code) {
 }
 const pubResponse = (r) => ({
   name: r.name, attending: !!r.attending, persons: r.persons, civil: !!r.civil,
-  companions: r.companions, diet: r.diet, vegetarian: !!r.vegetarian, vegan: !!r.vegan, song: r.song || '', beitrag: r.beitrag || '', message: r.message, updated_at: r.updated_at,
+  companions: r.companions, diet: r.diet, vegetarian: !!r.vegetarian, vegan: !!r.vegan, personen: personenVon(r) || [], song: r.song || '', beitrag: r.beitrag || '', message: r.message, updated_at: r.updated_at,
 });
 
 async function handleRsvp(req, res) {
@@ -460,15 +463,19 @@ async function handleRsvp(req, res) {
   const max = inv ? inv.max_persons : int(s.max_persons_open, 1, 20);
   const persons = b.attending ? int(b.persons, 1, max) : 0;
   const civilAllowed = s.civil_mode === 'all' || !!inv?.civil;
+  // Personenliste: Name, Essenswunsch und Hinweis je Person. Die erste Person ist die Anmeldung selbst.
+  const liste = b.attending && Array.isArray(b.personen) ? bereinigen(b.personen, persons, (t, n) => str(t, n)) : null;
+  if (liste) liste[0].name = name;
   const row = {
     name,
     attending: b.attending ? 1 : 0,
     persons,
     civil: b.attending && civilAllowed && b.civil ? 1 : 0,
-    companions: b.attending ? str(b.companions, 600) : '',
-    diet: '', // Feld für Allergien gibt es seit 4.6.5 nicht mehr
-    vegetarian: b.attending && b.vegetarian ? 1 : 0,
-    vegan: b.attending && b.vegan ? 1 : 0,
+    companions: liste ? liste.slice(1).map((p) => p.name).filter(Boolean).join(', ') : (b.attending ? str(b.companions, 600) : ''),
+    diet: liste ? liste.filter((p) => p.hinweis).map((p) => `${p.name || 'Gast'}: ${p.hinweis}`).join('; ').slice(0, 600) : '',
+    vegetarian: liste ? (liste.some((p) => p.kost === 'vegetarisch') ? 1 : 0) : (b.attending && b.vegetarian ? 1 : 0),
+    vegan: liste ? (liste.some((p) => p.kost === 'vegan') ? 1 : 0) : (b.attending && b.vegan ? 1 : 0),
+    personen: liste ? JSON.stringify(liste) : '',
     song: b.attending && s.zusage_song !== '0' ? str(b.song, 200) : '',
     beitrag: b.attending && s.zusage_beitrag !== '0' ? str(b.beitrag, 400) : '',
     message: str(b.message, 1500),
@@ -479,13 +486,13 @@ async function handleRsvp(req, res) {
     ? db.prepare('SELECT id, token FROM responses WHERE invite_id = ?').get(inv.id)
     : token ? db.prepare('SELECT id, token FROM responses WHERE invite_id IS NULL AND token = ?').get(token) : null;
   if (existing) {
-    db.prepare(`UPDATE responses SET name=?, attending=?, persons=?, civil=?, companions=?, diet=?, vegetarian=?, vegan=?, song=?, beitrag=?, message=?, updated_at=? WHERE id=?`)
-      .run(row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.song, row.beitrag, row.message, now(), existing.id);
+    db.prepare(`UPDATE responses SET name=?, attending=?, persons=?, civil=?, companions=?, diet=?, vegetarian=?, vegan=?, personen=?, song=?, beitrag=?, message=?, updated_at=? WHERE id=?`)
+      .run(row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.personen, row.song, row.beitrag, row.message, now(), existing.id);
     id = existing.id;
   } else {
-    const r = db.prepare(`INSERT INTO responses (invite_id, name, attending, persons, civil, companions, diet, vegetarian, vegan, song, beitrag, message, created_at, updated_at, token)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(inv?.id ?? null, row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.song, row.beitrag, row.message, now(), now(), crypto.randomBytes(18).toString('hex'));
+    const r = db.prepare(`INSERT INTO responses (invite_id, name, attending, persons, civil, companions, diet, vegetarian, vegan, personen, song, beitrag, message, created_at, updated_at, token)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(inv?.id ?? null, row.name, row.attending, row.persons, row.civil, row.companions, row.diet, row.vegetarian, row.vegan, row.personen, row.song, row.beitrag, row.message, now(), now(), crypto.randomBytes(18).toString('hex'));
     id = Number(r.lastInsertRowid);
   }
   const saved = db.prepare('SELECT * FROM responses WHERE id = ?').get(id);
@@ -507,8 +514,8 @@ function overview() {
     stats: {
       persons: yes.reduce((a, r) => a + r.persons, 0),
       civil: yes.filter((r) => r.civil).reduce((a, r) => a + r.persons, 0),
-      vegetarian: yes.filter((r) => r.vegetarian).length,
-      vegan: yes.filter((r) => r.vegan).length,
+      vegetarian: kostZahlen(responses).vegetarisch,   // seit 1.8.0 Personen, früher Anmeldungen
+      vegan: kostZahlen(responses).vegan,
       yes: yes.length,
       no: no.length,
       declinedPersons: no.reduce((a, r) => a + (r.max_persons || 1), 0),
@@ -538,11 +545,12 @@ function csvCell(v) {
 }
 function exportCsv() {
   const o = overview();
-  const lines = [['Name', 'Antwort', 'Personen', 'Standesamt', 'Mitreisende', 'Vegetarisch', 'Vegan', 'Nachricht', 'Geantwortet am']];
+  const lines = [['Name', 'Antwort', 'Personen', 'Standesamt', 'Mitreisende', 'Vegetarisch (Personen)', 'Vegan (Personen)', 'Essen je Person', 'Nachricht', 'Geantwortet am']];
   for (const r of o.responses)
-    lines.push([r.name, r.attending ? 'Zusage' : 'Absage', r.persons, r.civil ? 'ja' : '', r.companions, r.vegetarian ? 'ja' : '', r.vegan ? 'ja' : '', r.message, r.updated_at]);
+    { const l = r.attending ? personenVon(r) : null; const z = kostZahlen([r]);
+      lines.push([r.name, r.attending ? 'Zusage' : 'Absage', r.persons, r.civil ? 'ja' : '', r.companions, z.vegetarisch || '', z.vegan || '', l ? l.map((p) => `${p.name || 'Gast'}: ${p.kost || 'alles'}${p.hinweis ? ` (${p.hinweis})` : ''}`).join('; ') : '', r.message, r.updated_at]); }
   for (const i of o.invites.filter((x) => !x.response_id))
-    lines.push([i.name, 'offen', '', '', '', '', '', '', '', '']);
+    lines.push([i.name, 'offen', '', '', '', '', '', '', '', '', '']);
   return '﻿' + lines.map((l) => l.map(csvCell).join(';')).join('\r\n');
 }
 function exportInvitesCsv() {

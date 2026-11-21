@@ -99,13 +99,15 @@ function antworten() {
     for (const r of daten.responses) {
       if (filter === 'ja' && !r.attending) continue;
       if (filter === 'nein' && r.attending) continue;
-      if (filter === 'essen' && !(r.attending && (r.vegetarian || r.vegan))) continue;
+      const pl = r.attending ? personenListe(r) : [];
+      if (filter === 'essen' && !(r.attending && (pl.some((p) => p.kost) || (!pl.length && (r.vegetarian || r.vegan))))) continue;
       if (filter === 'wuensche' && !(r.attending && (r.song || r.beitrag))) continue;
       if (!passt(r.name) && !passt(r.invite_name) && !passt(r.companions)) continue;
       const details = [
         r.civil ? '<p><b>Standesamt:</b> ja</p>' : '',
         r.companions ? `<p><b>Mitreisende:</b> ${esc(r.companions)}</p>` : '',
-        r.attending && (r.vegetarian || r.vegan) ? `<p class="essen">${r.vegetarian ? '<span class="marke gruen">Vegetarisch</span>' : ''}${r.vegan ? '<span class="marke gruen">Vegan</span>' : ''}</p>` : '',
+        pl.length ? `<p class="personen-details"><b>Personen:</b> ${pl.map((p) => `${esc(p.name || 'Gast')}${p.kost ? ` <span class="marke gruen">${p.kost === 'vegan' ? 'Vegan' : 'Vegetarisch'}</span>` : ''}${p.hinweis ? ` <i>(${esc(p.hinweis)})</i>` : ''}`).join(' · ')}</p>`
+          : r.attending && (r.vegetarian || r.vegan) ? `<p class="essen">${r.vegetarian ? '<span class="marke gruen">Vegetarisch</span>' : ''}${r.vegan ? '<span class="marke gruen">Vegan</span>' : ''}</p>` : '',
         r.diet ? `<p><b>Allergien/Wünsche:</b> ${esc(r.diet)}</p>` : '',
         r.song ? `<p><b>Songwunsch:</b> ${esc(r.song)}</p>` : '',
         r.beitrag ? `<p><b>Beitrag:</b> ${esc(r.beitrag)}</p>` : '',
@@ -144,6 +146,9 @@ document.addEventListener('click', async (e) => {
     laden();
   }
 });
+
+// Personenliste einer Antwort (neue Antworten), sonst leer
+function personenListe(r) { try { const l = JSON.parse(r.personen || '[]'); return Array.isArray(l) ? l : []; } catch { return []; } }
 
 /* Angaben */
 // Standardfarben der Gästeseite, gleich wie in public/style.css. Ein leerer Wert in den Angaben heißt: Standard.

@@ -657,3 +657,27 @@ main { padding: 22px 32px 56px; max-width: 1500px; width: 100%; margin: 0 auto; 
   main { padding: 16px 16px 48px; }
 }
 .i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Raumplan: Tische frei auf einer Fläche */
+.raum-modus > .sitz-leiste, .raum-modus > .sitz-hilfe, .raum-modus > .auswahl-leiste, .raum-modus > .sitzplan { display: none; }
+.ansicht-wahl { margin-bottom: 12px; }
+.rp-leiste select { width: auto; border-radius: 11px; height: 40px; padding: 0 12px; background: var(--glas); }
+.rp-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr) 260px; gap: 14px; align-items: start; margin-top: 12px; }
+.rp-pool { max-height: 760px; overflow: auto; position: sticky; top: 16px; }
+.rp-buehne { background: var(--glas); border-radius: 16px; box-shadow: 0 0 0 1px var(--linie), var(--schatten); padding: 10px; }
+#rp-flaeche { display: block; width: 100%; height: auto; touch-action: none; user-select: none; }
+.rp-tisch { cursor: grab; }
+.rp-tisch:active { cursor: grabbing; }
+.rp-platz[data-gast] { cursor: grab; }
+.rp-ziel .rp-koerper { stroke: #3fa77f !important; stroke-width: 4 !important; }
+.rp-panel { position: sticky; top: 16px; gap: 12px; }
+.rp-panel label { display: grid; gap: 4px; }
+.rp-panel input[type="range"] { padding: 0; accent-color: var(--einband); }
+.rp-panel .reihe > button { flex: 1 1 auto; }
+.rp-gaeste { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rp-gaeste li { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: .92rem; }
+.rp-gaeste small { color: var(--tinte-weich); }
+.link-knopf { font: inherit; background: none; border: 0; padding: 0; color: var(--einband); text-decoration: underline; cursor: pointer; }
+.rp-geist { position: fixed; z-index: 100; pointer-events: none; padding: 6px 12px; border-radius: 999px; background: var(--wald); color: #fff; font-weight: 500; box-shadow: 0 10px 24px -10px #000a; }
+@media (max-width: 1100px) { .rp-layout { grid-template-columns: minmax(0, 1fr); } .rp-pool, .rp-panel { position: static; max-height: none; } }
+@media print { body.druck-raumplan .kopf, body.druck-raumplan .zahlen, body.druck-raumplan .rp-leiste, body.druck-raumplan .rp-pool, body.druck-raumplan .rp-panel, body.druck-raumplan .hilfe, body.druck-raumplan .ansicht-wahl { display: none !important; } body.druck-raumplan .app { display: block; } body.druck-raumplan .rp-layout { display: block; } }

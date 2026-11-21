@@ -230,3 +230,5 @@ document.querySelectorAll('[data-gruppierung]').forEach((b) => b.addEventListene
   zeichnen();
 }));
 document.addEventListener('reiter', (e) => { if (e.detail === 'sitzplan') laden().catch((x) => alert(x.message)); });
+// Der Raumplan hat Gäste oder Tische geändert
+document.addEventListener('sitzplan-geaendert', () => laden().catch(() => {}));

@@ -83,9 +83,9 @@ CREATE TABLE IF NOT EXISTS dienstleister (id INTEGER PRIMARY KEY, name TEXT NOT 
       teile.push(`<section><h2>Zahlen</h2>
         <dl class="zahlen"><div><dt>Zugesagt</dt><dd>${st.persons} ${st.persons === 1 ? 'Person' : 'Personen'}</dd></div>
         <div><dt>Noch ohne Antwort</dt><dd>${st.openPersons} ${st.openPersons === 1 ? 'Person' : 'Personen'}</dd></div>
-        <div><dt>Vegetarisch</dt><dd>${st.vegetarian} ${st.vegetarian === 1 ? 'Antwort' : 'Antworten'}</dd></div>
-        <div><dt>Vegan</dt><dd>${st.vegan} ${st.vegan === 1 ? 'Antwort' : 'Antworten'}</dd></div></dl>
-        <p class="leer">Eine Antwort kann mehrere Personen umfassen, die genaue Zahl für das Menü nennt euch das Paar.${TAG.test(s.deadline) ? ` Antwortfrist: ${esc(langesDatum(s.deadline))}.` : ''}</p></section>`);
+        <div><dt>Vegetarisch</dt><dd>${st.vegetarian} ${st.vegetarian === 1 ? 'Person' : 'Personen'}</dd></div>
+        <div><dt>Vegan</dt><dd>${st.vegan} ${st.vegan === 1 ? 'Person' : 'Personen'}</dd></div></dl>
+        <p class="leer">Stand der Zusagen, ${TAG.test(s.deadline) ? `Antwortfrist: ${esc(langesDatum(s.deadline))}. ` : ''}Ältere Zusagen ohne Angabe je Person zählen mit einer Person.</p></section>`);
     }
     if (d.songs) {
       const songs = [...new Set(db.prepare("SELECT song FROM responses WHERE attending = 1 AND song != '' ORDER BY id").all().map((r) => r.song))].slice(0, 300);

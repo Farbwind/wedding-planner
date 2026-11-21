@@ -4,6 +4,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { personenVon } from './essen.js';
 
 // In der Verwaltung gepflegte Sammlungen
 const SAMMLUNGEN = {
@@ -26,6 +27,26 @@ CREATE TABLE IF NOT EXISTS sitz (gast TEXT PRIMARY KEY, tisch INTEGER, sort INTE
 CREATE TABLE IF NOT EXISTS gast_info (gast TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', gruppe TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gruppe TEXT NOT NULL DEFAULT '');
 `);
+
+  // Raumplan (seit 1.9.0): Form, Lage, Größe und Drehung der Tische, dazu Objekte wie Bühne oder Tanzfläche
+  for (const [spalte, typ] of [['form', "TEXT NOT NULL DEFAULT 'rund'"], ['x', 'REAL'], ['y', 'REAL'], ['breite', 'REAL NOT NULL DEFAULT 0'], ['hoehe', 'REAL NOT NULL DEFAULT 0'], ['drehung', 'REAL NOT NULL DEFAULT 0'], ['art', "TEXT NOT NULL DEFAULT 'tisch'"]])
+    if (!db.prepare("SELECT 1 FROM pragma_table_info('tische') WHERE name = ?").get(spalte)) db.exec(`ALTER TABLE tische ADD COLUMN ${spalte} ${typ}`);
+  const FORMEN = ['rund', 'rechteck', 'lang', 'oval'];
+  const OBJEKTE = ['Bühne', 'Tanzfläche', 'Buffet', 'Bar', 'DJ', 'Eingang', 'Torte', 'Fotoecke'];
+  const zahl = (v, min, max, standard) => (Number.isFinite(Number(v)) && v !== null && v !== '' ? Math.min(max, Math.max(min, Number(v))) : standard);
+  // Lage und Form aus den Eingaben, nur die Felder, die mitgeschickt wurden
+  function tischFelder(b, alt = {}) {
+    const art = b.art === 'objekt' ? 'objekt' : (alt.art || 'tisch');
+    return {
+      art,
+      form: FORMEN.includes(b.form) ? b.form : (alt.form || 'rund'),
+      x: 'x' in b ? zahl(b.x, 0, 1200, null) : (alt.x ?? null),
+      y: 'y' in b ? zahl(b.y, 0, 760, null) : (alt.y ?? null),
+      breite: 'breite' in b ? zahl(b.breite, 30, 700, 0) : (alt.breite || 0),
+      hoehe: 'hoehe' in b ? zahl(b.hoehe, 30, 500, 0) : (alt.hoehe || 0),
+      drehung: 'drehung' in b ? zahl(b.drehung, -360, 360, 0) : (alt.drehung || 0),
+    };
+  }
 
   const jetzt = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
 
@@ -125,8 +146,10 @@ CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT N
     const out = [];
     for (const r of db.prepare('SELECT * FROM responses WHERE attending = 1 ORDER BY name COLLATE NOCASE').all()) {
       const n = Math.max(1, r.persons);
+      const personenListe = personenVon(r);
       let namen = (r.companions || '').split(trenner).map((t) => t.trim()).filter(Boolean);
-      if (n === 1) namen = [r.name];
+      if (personenListe) namen = personenListe.map((p, i) => p.name || (i === 0 ? r.name : ''));
+      else if (n === 1) namen = [r.name];
       else if (namen.length >= n) namen = namen.slice(0, n);
       else if (!namen.length && r.name.split(trenner).filter(Boolean).length === n) namen = r.name.split(trenner).map((t) => t.trim()).filter(Boolean);
       else namen = [r.name, ...namen];
@@ -138,7 +161,7 @@ CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT N
         const ausGaesteliste = (liste.find((x) => klein(x.name) === klein(namen[i])) || liste[0])?.gruppe || '';
         out.push({ key, name: g?.name || namen[i] || `Begleitung ${i}`, haushalt: `r${r.id}`, haushaltName: r.name,
           gruppe: g?.gruppe || ausGaesteliste, tisch: sitz.get(key)?.tisch ?? null, sort: sitz.get(key)?.sort ?? 0,
-          vegetarisch: !!r.vegetarian, vegan: !!r.vegan });
+          vegetarisch: personenListe ? personenListe[i]?.kost === 'vegetarisch' : !!r.vegetarian, vegan: personenListe ? personenListe[i]?.kost === 'vegan' : !!r.vegan });
       }
     }
     for (const x of db.prepare('SELECT * FROM gaeste_extra ORDER BY name COLLATE NOCASE').all()) {
@@ -291,14 +314,22 @@ CREATE TABLE IF NOT EXISTS gaeste_extra (id INTEGER PRIMARY KEY, name TEXT NOT N
       const b = await leseJson(req, 16 * 1024);
       const max = db.prepare('SELECT COALESCE(MAX(sort), 0) AS s FROM tische').get().s;
       const anzahl = db.prepare('SELECT COUNT(*) AS n FROM tische').get().n;
-      db.prepare('INSERT INTO tische (sort, name, plaetze) VALUES (?, ?, ?)').run(max + 1, str(b.name, 60) || `Tisch ${anzahl + 1}`, int(b.plaetze, 1, 40) || 8);
-      json(res, 200, { ok: true });
+      const f = tischFelder(b);
+      const plaetze = f.art === 'objekt' ? 0 : (int(b.plaetze, 1, 40) || 8);
+      const r = db.prepare('INSERT INTO tische (sort, name, plaetze, form, x, y, breite, hoehe, drehung, art) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .run(max + 1, str(b.name, 60) || (f.art === 'objekt' ? 'Objekt' : `Tisch ${anzahl + 1}`), plaetze, f.form, f.x, f.y, f.breite, f.hoehe, f.drehung, f.art);
+      json(res, 200, { ok: true, id: Number(r.lastInsertRowid) });
       return true;
     }
     if ((t = p.match(/^\/api\/admin\/sitzplan\/tisch\/(\d+)$/))) {
       if (m === 'PUT') {
         const b = await leseJson(req, 16 * 1024);
-        db.prepare('UPDATE tische SET name = ?, plaetze = ? WHERE id = ?').run(str(b.name, 60) || 'Tisch', int(b.plaetze, 1, 40) || 8, Number(t[1]));
+        const alt = db.prepare('SELECT * FROM tische WHERE id = ?').get(Number(t[1]));
+        if (!alt) { json(res, 404, { error: 'Nicht gefunden.' }); return true; }
+        const f = tischFelder(b, alt);
+        const plaetze = alt.art === 'objekt' ? 0 : ('plaetze' in b ? (int(b.plaetze, 1, 40) || 8) : alt.plaetze);
+        db.prepare('UPDATE tische SET name = ?, plaetze = ?, form = ?, x = ?, y = ?, breite = ?, hoehe = ?, drehung = ? WHERE id = ?')
+          .run('name' in b ? str(b.name, 60) || alt.name : alt.name, plaetze, f.form, f.x, f.y, f.breite, f.hoehe, f.drehung, alt.id);
         json(res, 200, { ok: true });
         return true;
       }

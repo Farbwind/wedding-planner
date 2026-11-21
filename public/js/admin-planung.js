@@ -57,7 +57,7 @@ function planZeichnen() {
   const z = plan.zahlen;
   $('#z-s-ja').textContent = z.standesamt.ja; $('#z-s-eingeladen').textContent = `/${z.standesamt.eingeladen}`; $('#z-s-nein').textContent = z.standesamt.nein;
   $('#z-h-ja').textContent = z.hochzeit.ja; $('#z-h-eingeladen').textContent = `/${z.hochzeit.eingeladen}`; $('#z-h-nein').textContent = z.hochzeit.nein;
-  $('#z-veggie').textContent = `${z.vegetarisch} Antw.`; $('#z-vegan').textContent = `${z.vegan} Antw.`;
+  $('#z-veggie').textContent = `${z.vegetarisch} Pers.`; $('#z-vegan').textContent = `${z.vegan} Pers.`;
   $('#z-personen').textContent = z.personenZugesagt;
   $('#z-versendet').textContent = `${z.versendet}/${plan.gaeste.length}`;
   platzZeichnen();
