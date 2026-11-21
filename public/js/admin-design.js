@@ -121,6 +121,7 @@ $('#dsg-formen').addEventListener('click', (e) => {
 function aufbauZeichnen() {
   const name = (id) => info.sektionen.find(([k]) => k === id)?.[1] || id;
   $('#dsg-aufbau').innerHTML = `
+    <fieldset class="dsg-wahl"><legend>Motiv (nur beim Anfang „Karte mit Motiv“)</legend><div class="dsg-schriften">${info.motive.map(([k, t]) => `<button type="button" class="dsg-schrift${d.motiv === k ? ' aktiv' : ''}" data-form="motiv" data-wert="${k}" aria-pressed="${d.motiv === k}"><strong>${esc(t)}</strong></button>`).join('')}</div></fieldset>
     <fieldset class="dsg-wahl"><legend>Anfang der Seite</legend><div class="dsg-heros">${info.heros.map(([k, t]) => `<button type="button" class="dsg-hero${d.hero === k ? ' aktiv' : ''}" data-form="hero" data-wert="${k}" aria-pressed="${d.hero === k}"><span class="dsg-hero-bild dsg-hero-${k}"><i></i><i></i></span>${t}</button>`).join('')}</div></fieldset>
     <fieldset class="dsg-wahl"><legend>Kleine Effekte</legend>${info.elemente.map(([k, t]) => `<label class="haken"><input type="checkbox" data-element="${k}" ${d.elemente[k] !== false ? 'checked' : ''}> ${t}</label>`).join('')}</fieldset>
     <fieldset class="dsg-wahl"><legend>Abschnitte und Reihenfolge</legend>

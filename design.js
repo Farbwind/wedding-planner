@@ -2,6 +2,9 @@
 // Gespeichert wird ein JSON in settings ('design_json' veröffentlicht, 'design_entwurf' in Arbeit). Dieses Modul prüft alles, was hineinkommt,
 // und baut daraus das CSS und die Blöcke für seiten.js. Pro-Modus: nur HTML und CSS, kein JavaScript (siehe auch die Content-Security-Policy in server.js).
 
+import { MOTIVE, motivHtml } from './motive.js';
+export { MOTIVE };
+
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -18,6 +21,12 @@ const PINYON = F('Pinyon Script', [[400, 'normal', 'pinyon-script-latin-400-norm
 const INSTRUMENT = F('Instrument Serif', [[400, 'normal', 'instrument-serif-latin-400-normal'], [400, 'italic', 'instrument-serif-latin-400-italic']]);
 const BRICOLAGE = F('Bricolage Grotesque', [[400, 'normal', 'bricolage-grotesque-latin-400-normal'], [500, 'normal', 'bricolage-grotesque-latin-500-normal'], [600, 'normal', 'bricolage-grotesque-latin-600-normal'], [700, 'normal', 'bricolage-grotesque-latin-700-normal']]);
 const YOUNG = F('Young Serif', [[400, 'normal', 'young-serif-latin-400-normal']]);
+const ALLURA = F('Allura', [[400, 'normal', 'allura-latin-400-normal']]);
+const ELITE = F('Special Elite', [[400, 'normal', 'special-elite-latin-400-normal']]);
+const COURIER = F('Courier Prime', [[400, 'normal', 'courier-prime-latin-400-normal'], [700, 'normal', 'courier-prime-latin-700-normal']]);
+const OSWALD = F('Oswald', [[400, 'normal', 'oswald-latin-400-normal'], [500, 'normal', 'oswald-latin-500-normal'], [600, 'normal', 'oswald-latin-600-normal']]);
+const BODONI = F('Bodoni Moda', [[400, 'normal', 'bodoni-moda-latin-400-normal'], [500, 'normal', 'bodoni-moda-latin-500-normal'], [400, 'italic', 'bodoni-moda-latin-400-italic'], [500, 'italic', 'bodoni-moda-latin-500-italic']]);
+const REENIE = F('Reenie Beanie', [[400, 'normal', 'reenie-beanie-latin-400-normal']]);
 const CAVEAT = F('Caveat', [[500, 'normal', 'caveat-latin-500-normal'], [700, 'normal', 'caveat-latin-700-normal']]);
 
 export const SCHRIFTEN = {
@@ -29,6 +38,10 @@ export const SCHRIFTEN = {
   magazin: { name: 'Magazin', beschreibung: 'Instrument Serif und DM Sans, große Namen wie auf einem Titelblatt', titel: INSTRUMENT, text: DMSANS, stapelTitel: '"Instrument Serif", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif' },
   retro: { name: 'Retro', beschreibung: 'Young Serif und Bricolage Grotesque, kräftig und warm', titel: YOUNG, text: BRICOLAGE, stapelTitel: '"Young Serif", Georgia, serif', stapelText: '"Bricolage Grotesque", system-ui, sans-serif' },
   hand: { name: 'Handgeschrieben', beschreibung: 'Caveat für die Namen, Fraunces und DM Sans', titel: FRAUNCES, text: DMSANS, namenSchrift: CAVEAT, stapelTitel: '"Fraunces", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif', stapelName: '"Caveat", "Fraunces", cursive' },
+  zart: { name: 'Zart', beschreibung: 'Allura für „Wir heiraten“, Cormorant Garamond und Hanken Grotesk', titel: CORMORANT, text: HANKEN, namenSchrift: ALLURA, stapelTitel: '"Cormorant Garamond", Georgia, serif', stapelText: '"Hanken Grotesk", system-ui, sans-serif', stapelName: '"Allura", "Cormorant Garamond", cursive' },
+  schreibmaschine: { name: 'Schreibmaschine', beschreibung: 'Special Elite und DM Sans, wie getippt', titel: ELITE, text: DMSANS, stapelTitel: '"Special Elite", "Courier New", monospace', stapelText: '"DM Sans", system-ui, sans-serif' },
+  reisepass: { name: 'Reisepass', beschreibung: 'Oswald und Courier Prime, wie Stempel und Formular', titel: OSWALD, text: COURIER, stapelTitel: '"Oswald", Impact, sans-serif', stapelText: '"Courier Prime", "Courier New", monospace' },
+  franzoesisch: { name: 'Französisch', beschreibung: 'Bodoni Moda, Reenie Beanie für die Namen und DM Sans', titel: BODONI, text: DMSANS, namenSchrift: REENIE, stapelTitel: '"Bodoni Moda", Georgia, serif', stapelText: '"DM Sans", system-ui, sans-serif', stapelName: '"Reenie Beanie", "Bodoni Moda", cursive' },
   schlicht: { name: 'Schlicht', beschreibung: 'DM Sans in Titeln und Text', titel: DMSANS, text: DMSANS, stapelTitel: '"DM Sans", system-ui, sans-serif', stapelText: '"DM Sans", system-ui, sans-serif' },
 };
 
@@ -41,34 +54,33 @@ export const STILE = [
   ['retro', 'Retro', 'Kräftige Rahmen, harte Schatten, Wellenlinie unter den Titeln'],
   ['polaroid', 'Polaroid', 'Fotos mit weißem Rahmen und Klebeband, leicht schief'],
   ['fliesen', 'Fliesen', 'Doppelte Rahmen und ein Band aus Fliesenmuster'],
+  ['reise', 'Reise', 'Termine als Bordkarten, Stempel und Schreibmaschinenschrift'],
 ];
-export const HEROS = [['bogen', 'Foto im Bogen'], ['vollbild', 'Foto als Hintergrund'], ['geteilt', 'Foto geteilt, rechts'], ['schlicht', 'Nur Schrift']];
+export const HEROS = [['bogen', 'Foto im Bogen'], ['vollbild', 'Foto als Hintergrund'], ['geteilt', 'Foto geteilt, rechts'], ['schlicht', 'Nur Schrift'], ['karte', 'Karte mit Motiv']];
 export const BLOCKTYPEN = [['text', 'Text mit Überschrift'], ['zitat', 'Zitat'], ['bild', 'Bild'], ['zweispaltig', 'Bild und Text'], ['knopf', 'Knopf mit Link'], ['trenner', 'Trenner']];
 
 /* ---- Vorlagen ---- */
-const alleAn = { countdown: true, siegel: true, lichtpunkte: false, laufband: false, konfetti: true };
+const alleAn = { countdown: true, siegel: false, lichtpunkte: false, laufband: false, konfetti: true };
 const rf = ['countdown', 'termine', 'buchen', 'momente', 'geschenk', 'wissen'];
-// Eine Vorlage ist: Farben, Schrift, Charakter (stil), Flächen, Textur, Rundung, Knöpfe, Anfang und Effekte
-const v = (name, beschreibung, farben, schrift, o) => ({ name, beschreibung, design: { vorlage: null, farben, schrift, stil: o.stil || 'sanft', flaechen: o.flaechen || 'bunt', textur: o.textur || 'keine', rundung: o.rundung || 'weich', knoepfe: o.knoepfe || 'pille', hero: o.hero || 'bogen', elemente: { ...alleAn, ...(o.elemente || {}) }, reihenfolge: rf, aus: [], bloecke: [], css: '', html_oben: '', html_unten: '' } });
+// Eine Vorlage ist: Farben, Schrift, Motiv, Charakter (stil), Flächen, Textur, Rundung, Knöpfe, Anfang und Effekte
+const v = (name, beschreibung, farben, schrift, o) => ({ name, beschreibung, design: { vorlage: null, farben, schrift, motiv: o.motiv || 'keins', stil: o.stil || 'sanft', flaechen: o.flaechen || 'bunt', textur: o.textur || 'papier', rundung: o.rundung || 'weich', knoepfe: o.knoepfe || 'pille', hero: o.hero || 'karte', elemente: { ...alleAn, ...(o.elemente || {}) }, reihenfolge: rf, aus: [], bloecke: [], css: '', html_oben: '', html_unten: '' } });
 export const VORLAGEN = {
-  abendlicht: v('Abendlicht', 'Tiefes Salbeigrün auf warmem Cremeweiß, Goldlinien, Foto im Bogen. Feierlich und warm.',
-    { akzent: '#3d5a47', grund: '#f8f1e3', band: '#ecdfc4', text: '#2a2b26', gold: '#b4803a', licht: '#f2d9a6', tief: '#22372b' }, 'klassisch', { textur: 'papier', elemente: { siegel: true } }),
-  dolcevita: v('Dolce Vita', 'Butter, Tomatenrot und Pinienwald. Italienischer Sommer mit Laufband und kräftigen Rahmen.',
-    { akzent: '#d2402b', grund: '#fdf2cc', band: '#f7de86', text: '#3a1f14', gold: '#1f6a4c', licht: '#ffd9c9', tief: '#1f5a43' }, 'retro', { stil: 'retro', textur: 'papier', rundung: 'weich', hero: 'bogen', elemente: { laufband: true, siegel: true } }),
-  magazin: v('Magazin', 'Zeitungspapier, Tinte und ein Hauch Zinnober. Namen so groß wie auf einem Titelblatt.',
-    { akzent: '#161513', grund: '#f1ece1', band: '#e3dccb', text: '#161513', gold: '#c4472b', licht: '#f1ece1', tief: '#161513' }, 'magazin', { stil: 'magazin', textur: 'papier', rundung: 'eckig', knoepfe: 'eckig', hero: 'geteilt', elemente: { siegel: false, laufband: true, konfetti: false } }),
-  olivgarten: v('Olivgarten', 'Olive, Salbei und Sonnengold. Runde Formen, weich und wild wie ein Gartenfest.',
-    { akzent: '#55683a', grund: '#f5f1e1', band: '#dde4c4', text: '#263020', gold: '#b9862f', licht: '#f1e2b0', tief: '#34441f' }, 'boho', { textur: 'papier', rundung: 'rund', hero: 'bogen', elemente: { siegel: true } }),
-  mitternacht: v('Mitternacht', 'Nachtblau, Gold und aufsteigende Sterne. Das einzige Design mit Lichtpunkten.',
-    { akzent: '#e3c27c', grund: '#0f1b27', band: '#172838', text: '#eaeef2', gold: '#e3c27c', licht: '#31465a', tief: '#08121b' }, 'elegant', { textur: 'papier', hero: 'vollbild', elemente: { siegel: true, lichtpunkte: true } }),
-  polaroid: v('Polaroid', 'Blush, Weinrot und ein Album voller Schnappschüsse mit Klebeband. Persönlich und handgeschrieben.',
-    { akzent: '#9c4558', grund: '#fbeee9', band: '#f2d6d0', text: '#3b2427', gold: '#c08a5b', licht: '#f8dccf', tief: '#5b2a36' }, 'hand', { stil: 'polaroid', textur: 'papier', rundung: 'weich', hero: 'bogen', elemente: { siegel: false } }),
-  azul: v('Azul', 'Kobaltblau, Cremeweiß und Sonnengelb. Fliesenmuster und doppelte Rahmen wie am Mittelmeer.',
-    { akzent: '#1d4fa3', grund: '#f7f3e7', band: '#d3e1f4', text: '#12254a', gold: '#e8ae2c', licht: '#d3e1f4', tief: '#0d2d66' }, 'modern', { stil: 'fliesen', textur: 'keine', rundung: 'eckig', knoepfe: 'eckig', hero: 'geteilt', elemente: { siegel: false, konfetti: true } }),
+  schleierkraut: v('Schleierkraut', 'Salbeigrüne Karte mit gezeichnetem Trockenblumenstrauß, zarte Schreibschrift, weiße Blüten.',
+    { akzent: '#5c6b4b', grund: '#eef0e1', band: '#d6dcc3', text: '#2e3528', gold: '#a39463', licht: '#f6f3e2', tief: '#46553a' }, 'zart', { motiv: 'schleierkraut' }),
+  himmel: v('Himmel', 'Blauer Himmel, Wolken und schwebende Seifenblasen. Leicht, verträumt und so noch nirgends gesehen.',
+    { akzent: '#4a7fbf', grund: '#f3f8ff', band: '#dbeafb', text: '#22364d', gold: '#e08fb5', licht: '#ffe8f2', tief: '#2f5580' }, 'magazin', { motiv: 'himmel', textur: 'keine', rundung: 'rund' }),
+  sueden: v('Süden', 'Gezeichnetes Küstendorf mit Olivenbäumen, Palme und Leuchtturm. Cremefarbenes Papier und Schreibschrift.',
+    { akzent: '#35523f', grund: '#f6eee0', band: '#e8dcc5', text: '#2b2a25', gold: '#2e6173', licht: '#f1e3c8', tief: '#26403a' }, 'schreib', { motiv: 'sueden' }),
+  fingerabdruck: v('Fingerabdruck', 'Kraftpapier, ein Herz aus Fingerabdruck in Rot und Schreibmaschinenschrift. Handgemacht und persönlich.',
+    { akzent: '#b2382a', grund: '#dcc19b', band: '#d0b088', text: '#4a3225', gold: '#b2382a', licht: '#e8d2ad', tief: '#5a2b22' }, 'schreibmaschine', { motiv: 'fingerabdruck', rundung: 'eckig', knoepfe: 'eckig' }),
+  reisepass: v('Reisepass', 'Pass mit Globus, Stempel und Bordkarten für die Termine. Für alle, die gern verreisen.',
+    { akzent: '#1f3a5f', grund: '#f0e7d1', band: '#e3d6b6', text: '#2a2a27', gold: '#b48e36', licht: '#f4e8c6', tief: '#14263f' }, 'reisepass', { motiv: 'reise', stil: 'reise', rundung: 'eckig', knoepfe: 'eckig' }),
+  karikatur: v('Karikatur', 'Braut und Bräutigam als lockere Tuschezeichnung im französischen Stil, mit Schreibschrift und Bodoni.',
+    { akzent: '#27324d', grund: '#fbf5ea', band: '#f2e4d3', text: '#232323', gold: '#c8453a', licht: '#f7dcd2', tief: '#222b44' }, 'franzoesisch', { motiv: 'karikatur' }),
 };
 for (const [id, vl] of Object.entries(VORLAGEN)) vl.design.vorlage = id;
 
-export const standardDesign = () => JSON.parse(JSON.stringify(VORLAGEN.abendlicht.design));
+export const standardDesign = () => JSON.parse(JSON.stringify(VORLAGEN.schleierkraut.design));
 
 /* ---- Eingaben prüfen: nur bekannte Felder, Werte aus Listen, Farben als #rrggbb, Texte gekürzt ---- */
 const kurz = (t, n) => String(t ?? '').slice(0, n);
@@ -79,6 +91,7 @@ export function bereinigen(eingabe) {
     vorlage: VORLAGEN[e.vorlage] ? e.vorlage : 'eigene',
     farben: {},
     schrift: SCHRIFTEN[e.schrift] ? e.schrift : basis.schrift,
+    motiv: MOTIVE.some(([k]) => k === e.motiv) ? e.motiv : 'keins',
     stil: STILE.some(([k]) => k === e.stil) ? e.stil : 'sanft',
     flaechen: ['ruhig', 'bunt'].includes(e.flaechen) ? e.flaechen : 'ruhig',
     textur: ['keine', 'papier'].includes(e.textur) ? e.textur : 'keine',
@@ -167,7 +180,7 @@ export function cssVon(design) {
 export function htmlAttribute(d) {
   const aus = [...Object.entries(d.elemente).filter(([, an]) => !an).map(([k]) => k)];
   const dunkel = hell(d.farben.grund) < 0.3 ? ' data-dunkel' : '';
-  return ` data-hero="${esc(d.hero)}" data-knoepfe="${esc(d.knoepfe)}" data-rundung="${esc(d.rundung)}" data-stil="${esc(d.stil)}" data-flaechen="${esc(d.flaechen)}" data-textur="${esc(d.textur)}" data-aus="${esc(aus.join(' '))}"${dunkel}`;
+  return ` data-hero="${esc(d.hero)}" data-knoepfe="${esc(d.knoepfe)}" data-rundung="${esc(d.rundung)}" data-stil="${esc(d.stil)}" data-motiv="${esc(d.motiv)}" data-flaechen="${esc(d.flaechen)}" data-textur="${esc(d.textur)}" data-aus="${esc(aus.join(' '))}"${dunkel}`;
 }
 
 /* ---- Eigene Blöcke ---- */
@@ -218,7 +231,7 @@ export function laufbandHtml(d, teile) {
 }
 
 // Alles, was seiten.js für eine Seite braucht
-export function aufbereiten(design, laufbandTexte) {
+export function aufbereiten(design, laufbandTexte, motivTexte) {
   const d = bereinigen(design);
   return {
     design: d,
@@ -227,6 +240,7 @@ export function aufbereiten(design, laufbandTexte) {
     attribute: htmlAttribute(d),
     bloecke: bloeckeHtml(d),
     laufband: laufbandHtml(d, laufbandTexte),
+    motiv: motivHtml(d.motiv, motivTexte),
     oben: htmlSaeubern(d.html_oben),
     unten: htmlSaeubern(d.html_unten),
   };

@@ -42,9 +42,10 @@ export function seitenGeruest({ VERSION, PUB, getSettings, getDesign }) {
     const p = paar();
     const st = getSettings();
     const datum = st.church_date ? new Date(`${st.church_date}T12:00:00`).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-    const a = aufbereiten(design || getDesign(), [p.voll, datum, st.party_place || st.church_place]);
+    const kurz = st.church_date ? st.church_date.split('-').reverse().join('.') : '';
+    const a = aufbereiten(design || getDesign(), [p.voll, datum, st.party_place || st.church_place], { datumKurz: kurz, ort: st.party_place || st.church_place || '' });
     if (name === 'start') {
-      inhalt = inhalt.replace('<main>', `<main>\n<div class="pro-oben" style="order:-1">${a.oben}</div>\n${a.laufband}`).replace('</main>', `${a.bloecke}\n<div class="pro-unten" style="order:9999">${a.unten}</div>\n</main>`);
+      inhalt = inhalt.replace('<div class="hero-text">', `${a.motiv}<div class="hero-text">`).replace('<main>', `<main>\n<div class="pro-oben" style="order:-1">${a.oben}</div>\n${a.laufband}`).replace('</main>', `${a.bloecke}\n<div class="pro-unten" style="order:9999">${a.unten}</div>\n</main>`);
     }
     const menue = MENUE.map(([href, text, seite]) =>
       `<a href="${href}"${seite === name && name !== 'start' ? ' aria-current="page"' : ''}>${esc(text)}</a>`).join('\n      ');
@@ -60,6 +61,7 @@ export function seitenGeruest({ VERSION, PUB, getSettings, getDesign }) {
 <link rel="icon" href="/img/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${v('/style.css')}">
+<link rel="stylesheet" href="${v('/motive.css')}">
 <style id="design">${a.css}</style>${a.proCss ? `<style id="pro-css">${a.proCss}</style>` : ''}
 </head>
 <body class="seite-${name}">
