@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Design-Dokumentation für die Gästeseite</title>
+<style>
+@font-face { font-family: "Cormorant Garamond"; src: url(/fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Hanken Grotesk"; src: url(/fonts/hanken-grotesk-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Hanken Grotesk"; src: url(/fonts/hanken-grotesk-latin-600-normal.woff2) format("woff2"); font-weight: 600; font-display: swap; }
+:root { --tinte: #1d2430; --weich: #4f5a65; --linie: #d9ded5; --gruen: #2e4636; --papier: #f5f6f0; color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--papier); color: var(--tinte); font: 400 1rem/1.65 "Hanken Grotesk", system-ui, sans-serif; }
+.seite { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; max-width: 1080px; margin: 0 auto; padding: 40px 24px 96px; }
+nav { position: sticky; top: 24px; align-self: start; display: grid; gap: 4px; font-size: .92rem; }
+nav a { color: var(--weich); text-decoration: none; padding: 5px 0; }
+nav a:hover { color: var(--tinte); }
+nav strong { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.4rem; font-weight: 500; margin-bottom: 8px; }
+h1, h2, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; line-height: 1.15; }
+h1 { font-size: 2.8rem; margin: 0 0 12px; }
+h2 { font-size: 1.9rem; margin: 56px 0 10px; padding-top: 8px; border-top: 1px solid var(--linie); }
+h3 { font-size: 1.3rem; margin: 28px 0 6px; }
+p, li { max-width: 68ch; }
+code { font: .88em ui-monospace, Menlo, Consolas, monospace; background: #e8ece3; padding: 1px 6px; border-radius: 5px; }
+pre { background: #1d2430; color: #e9efe9; padding: 16px 18px; border-radius: 12px; overflow-x: auto; font: .86rem/1.55 ui-monospace, Menlo, Consolas, monospace; max-width: 100%; }
+pre code { background: none; padding: 0; color: inherit; }
+table { border-collapse: collapse; width: 100%; max-width: 780px; font-size: .94rem; }
+th, td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--linie); vertical-align: top; }
+th { font-weight: 600; }
+.hinweis { background: #e2ebe2; border-radius: 12px; padding: 12px 16px; max-width: 68ch; }
+.verboten { background: #f6e5e8; }
+a { color: var(--gruen); }
+@media (max-width: 860px) { .seite { grid-template-columns: minmax(0, 1fr); gap: 24px; } nav { position: static; grid-template-columns: repeat(2, 1fr); } nav strong { grid-column: 1 / -1; } h1 { font-size: 2.2rem; } }
+</style>
+</head>
+<body>
+<div class="seite">
+  <nav aria-label="Inhalt">
+    <strong>Design</strong>
+    <a href="#einstieg">Einstieg</a>
+    <a href="#aufbau">Aufbau der Seite</a>
+    <a href="#variablen">CSS-Variablen</a>
+    <a href="#attribute">Attribute am html</a>
+    <a href="#klassen">Klassen</a>
+    <a href="#bloecke">Eigene Blöcke</a>
+    <a href="#html">HTML-Bereiche</a>
+    <a href="#grenzen">Was nicht geht</a>
+    <a href="#rezepte">Beispiele</a>
+    <a href="#tipps">Tipps</a>
+  </nav>
+  <main>
+    <h1>Design der Gästeseite</h1>
+    <p>Die Startseite für eure Gäste lässt sich im Reiter <strong>Design</strong> ohne Code gestalten. Wer mehr will, schreibt im Pro-Modus eigenes CSS und HTML. Diese Seite beschreibt, woran ihr euch dabei halten könnt.</p>
+
+    <h2 id="einstieg">Einstieg</h2>
+    <ol>
+      <li>Öffnet in der Verwaltung den Reiter <strong>Design</strong> und wählt eine Vorlage.</li>
+      <li>Passt Farben, Schrift, Formen und Aufbau an. Alles landet zuerst in einem <strong>Entwurf</strong>, den nur ihr in der Vorschau seht.</li>
+      <li>Im Bereich <strong>Pro-Modus</strong> tragt ihr CSS und HTML ein. Die Vorschau lädt nach jeder Änderung neu.</li>
+      <li>Mit <strong>Veröffentlichen</strong> sehen eure Gäste die neue Fassung. <strong>Entwurf verwerfen</strong> geht zurück zur veröffentlichten Fassung.</li>
+    </ol>
+    <p>Die Vorschau ist auch direkt erreichbar: <code>/?entwurf=1</code> zeigt den Entwurf, aber nur, wenn ihr in der Verwaltung angemeldet seid.</p>
+
+    <h2 id="aufbau">Aufbau der Startseite</h2>
+    <p>Die Startseite ist <code>body.seite-start</code> mit einem <code>main</code>. Darin stehen diese Abschnitte, jeder mit einer eigenen Klasse. Die Reihenfolge stellt der Designer über die CSS-Eigenschaft <code>order</code> ein, deshalb ist <code>main</code> ein Flex-Container in Spaltenrichtung.</p>
+<pre><code>body.seite-start
+  header.kopf          Kopfzeile mit Menü
+  main
+    section.hero       Namen, Datum, Foto
+    section.countdown  Zähler bis zur Hochzeit
+    section.termine    Ablauf mit Datum, Ort, Kalenderlink
+    section.buchen     Zu- oder Absage
+    section.momente    Fotos und Geschichte von euch
+    section.geschenk   Geschenkwünsche
+    section.wissen     Gut zu wissen
+  footer.fuss          Fußzeile</code></pre>
+
+    <h2 id="variablen">CSS-Variablen</h2>
+    <p>Alle Farben, Schriften und Rundungen hängen an Variablen auf <code>:root</code>. Wer sie überschreibt, ändert die ganze Seite auf einmal. Die Werte setzt der Designer aus euren Einstellungen. Euer eigenes CSS gilt danach und gewinnt bei gleicher Spezifität.</p>
+    <table>
+      <tr><th>Variable</th><th>Bedeutung</th></tr>
+      <tr><td><code>--farbe-akzent</code></td><td>Hauptfarbe für Überschriften, Knöpfe und Linien</td></tr>
+      <tr><td><code>--farbe-akzent-dunkel</code></td><td>Akzent für Hover und gedrückte Knöpfe</td></tr>
+      <tr><td><code>--farbe-akzent-hell</code></td><td>sehr heller Ton des Akzents für Flächen</td></tr>
+      <tr><td><code>--farbe-auf-akzent</code></td><td>Schriftfarbe auf dem Akzent, automatisch hell oder dunkel</td></tr>
+      <tr><td><code>--farbe-grund</code></td><td>Hintergrund der Seite</td></tr>
+      <tr><td><code>--farbe-flaeche</code></td><td>Karten und Eingabefelder</td></tr>
+      <tr><td><code>--farbe-band</code></td><td>abgesetzte Bänder zwischen Abschnitten</td></tr>
+      <tr><td><code>--farbe-linie</code></td><td>feine Rahmen und Trennlinien</td></tr>
+      <tr><td><code>--farbe-text</code>, <code>--farbe-text-weich</code></td><td>Fließtext und zurückhaltender Text</td></tr>
+      <tr><td><code>--farbe-tief</code></td><td>dunkle Flächen: Countdown, Zusage, Fuß</td></tr>
+      <tr><td><code>--farbe-gold</code>, <code>--farbe-licht</code></td><td>Zierfarbe und warmer Schimmer</td></tr>
+      <tr><td><code>--schrift-titel</code>, <code>--schrift-text</code>, <code>--schrift-name</code></td><td>Schriftfamilien für Überschriften, Fließtext und die Namen im Anfang</td></tr>
+      <tr><td><code>--r-karte</code>, <code>--r-gross</code>, <code>--radius</code></td><td>Rundung von Karten, großen Flächen und kleinen Elementen</td></tr>
+    </table>
+
+    <h2 id="attribute">Attribute am html-Element</h2>
+    <p>Der Designer setzt Attribute, mit denen die Grundgestaltung Varianten umschaltet. Ihr könnt sie in eurem CSS als Selektor nutzen.</p>
+    <table>
+      <tr><th>Attribut</th><th>Werte</th></tr>
+      <tr><td><code>data-hero</code></td><td><code>bogen</code>, <code>vollbild</code>, <code>geteilt</code>, <code>schlicht</code></td></tr>
+      <tr><td><code>data-knoepfe</code></td><td><code>pille</code>, <code>eckig</code></td></tr>
+      <tr><td><code>data-rundung</code></td><td><code>eckig</code>, <code>weich</code>, <code>rund</code></td></tr>
+      <tr><td><code>data-aus</code></td><td>Leerzeichen-getrennte Liste ausgeschalteter Effekte: <code>siegel</code>, <code>lichtpunkte</code>, <code>konfetti</code></td></tr>
+    </table>
+<pre><code>/* nur im geteilten Anfang größere Namen */
+html[data-hero="geteilt"] .namen { font-size: clamp(3rem, 8vw, 6rem); }</code></pre>
+
+    <h2 id="klassen">Wichtige Klassen</h2>
+    <table>
+      <tr><th>Klasse</th><th>Was es ist</th></tr>
+      <tr><td><code>.hero</code>, <code>.hero-inhalt</code>, <code>.hero-bild</code></td><td>Anfang, Textspalte und Foto</td></tr>
+      <tr><td><code>.namen</code>, <code>.name</code>, <code>.und</code></td><td>die beiden Namen und das &amp;-Zeichen</td></tr>
+      <tr><td><code>.hero-datum</code>, <code>.hero-ort</code>, <code>.hero-vorspann</code></td><td>Datum, Ort und Satz über den Namen</td></tr>
+      <tr><td><code>.hero-siegel</code>, <code>.hero-licht</code></td><td>drehendes Siegel und aufsteigende Lichtpunkte</td></tr>
+      <tr><td><code>.countdown-zahlen</code>, <code>.zaehler</code></td><td>die Zähler für Tage, Stunden, Minuten</td></tr>
+      <tr><td><code>.termin</code>, <code>.termin-kopf</code>, <code>.termin-ort</code></td><td>ein Termin im Ablauf</td></tr>
+      <tr><td><code>.buchung</code>, <code>.felder</code>, <code>.feld</code></td><td>das Formular für die Zusage</td></tr>
+      <tr><td><code>.personen-liste</code></td><td>die Zeilen mit Name und Essenswunsch je Person</td></tr>
+      <tr><td><code>.knopf</code>, <code>.knopf-leise</code></td><td>Hauptknopf und zurückhaltender Knopf</td></tr>
+      <tr><td><code>.momente-raster</code></td><td>Raster der Fotos und Geschichten</td></tr>
+      <tr><td><code>.geschenk</code>, <code>.wissen</code></td><td>Abschnitte für Geschenke und Hinweise</td></tr>
+    </table>
+    <p class="hinweis">Tipp: Öffnet die Vorschau, klickt mit der rechten Maustaste auf ein Element und wählt „Untersuchen“. So seht ihr Klassen und Variablen direkt.</p>
+
+    <h2 id="bloecke">Eigene Blöcke</h2>
+    <p>Blöcke fügt der Designer ohne Code ein. Sie sind <code>section.block.block-TYP</code> mit einer Innenfläche <code>.block-innen</code> und stehen an der gewählten Stelle. Bis zu 12 Blöcke sind möglich.</p>
+    <table>
+      <tr><th>Typ</th><th>Klassen im Inneren</th></tr>
+      <tr><td><code>text</code></td><td><code>h2</code>, <code>.bl-text</code></td></tr>
+      <tr><td><code>zitat</code></td><td><code>.bl-zitat</code> mit <code>footer</code> für den Urheber</td></tr>
+      <tr><td><code>bild</code></td><td><code>.bl-bild</code> mit <code>img</code></td></tr>
+      <tr><td><code>zweispaltig</code></td><td><code>.bl-zwei</code> mit Bild links und Text rechts</td></tr>
+      <tr><td><code>knopf</code></td><td><code>.bl-text</code> und <code>a.knopf</code></td></tr>
+      <tr><td><code>trenner</code></td><td><code>.bl-trenner</code></td></tr>
+    </table>
+<pre><code>.block-zitat .bl-zitat { font-size: 1.8rem; font-style: italic; }
+#block-b1abc .block-innen { background: var(--farbe-akzent-hell); }</code></pre>
+    <p>Jeder Block hat eine eigene ID im Format <code>block-…</code>. Sie steht im Quelltext der Vorschau.</p>
+
+    <h2 id="html">HTML-Bereiche</h2>
+    <p>Im Pro-Modus gibt es zwei Bereiche: <strong>HTML oberhalb</strong> steht in der Startseite vor dem Anfang, <strong>HTML unterhalb</strong> nach den Abschnitten. Beide stehen in einem <code>div</code> mit der Klasse <code>pro-oben</code> bzw. <code>pro-unten</code>.</p>
+<pre><code>&lt;div class="hinweisband"&gt;
+  &lt;p&gt;Bitte denkt an wetterfeste Schuhe, die Feier geht in den Garten.&lt;/p&gt;
+&lt;/div&gt;
+&lt;style&gt;
+  .hinweisband { background: var(--farbe-akzent); color: var(--farbe-auf-akzent); text-align: center; padding: 10px 16px; }
+&lt;/style&gt;</code></pre>
+    <p>Bilder aus der Verwaltung liegen unter <code>/bilder/&lt;Name&gt;.jpg</code>. Ladet sie im Block „Bild“ hoch und übernehmt den Dateinamen aus dem Quelltext der Vorschau, wenn ihr sie im eigenen HTML verwenden wollt.</p>
+
+    <h2 id="grenzen">Was nicht geht</h2>
+    <p class="hinweis verboten">Aus Sicherheitsgründen und wegen des Datenschutzes gibt es harte Grenzen. Alles Folgende wird beim Speichern entfernt oder vom Browser blockiert.</p>
+    <ul>
+      <li><strong>Kein JavaScript:</strong> weder <code>&lt;script&gt;</code> noch Attribute wie <code>onclick</code> noch <code>javascript:</code>-Links.</li>
+      <li><strong>Keine eingebetteten Fremdinhalte:</strong> <code>iframe</code>, <code>object</code>, <code>embed</code>, <code>link</code>, <code>meta</code>, <code>base</code> sind entfernt.</li>
+      <li><strong>Keine eigenen Formulare:</strong> <code>form</code>, <code>input</code>, <code>button</code>, <code>textarea</code> und <code>select</code> fehlen im Pro-Modus. Die Zusage übernimmt das vorhandene Formular.</li>
+      <li><strong>Keine fremden Quellen:</strong> in CSS sind <code>@import</code> und <code>url(https://…)</code> gesperrt. Schriften und Bilder müssen von dieser Seite kommen oder als <code>data:image/…</code> eingebettet sein. Das schützt eure Gäste vor Tracking durch Dritte.</li>
+      <li><strong>Größe:</strong> CSS und beide HTML-Bereiche je höchstens 30.000 Zeichen.</li>
+      <li><strong>Schriften:</strong> verfügbar sind die sechs Paarungen des Designers (Cormorant Garamond, Playfair Display, DM Serif Display, Fraunces, Pinyon Script, DM Sans, Hanken Grotesk). Weitere Schriften müssen als Datei auf dem Server liegen.</li>
+    </ul>
+
+    <h2 id="rezepte">Beispiele</h2>
+    <h3>Namen größer und mit Abstand</h3>
+<pre><code>.namen { font-size: clamp(3.4rem, 11vw, 7.5rem); letter-spacing: .01em; }</code></pre>
+    <h3>Alle Karten mit weichem Schatten statt Rahmen</h3>
+<pre><code>.termin, .buchung, .geschenk .block-innen {
+  border: 0;
+  box-shadow: 0 18px 40px -26px rgba(0, 0, 0, .35);
+}</code></pre>
+    <h3>Eigener Hintergrund für die Zusage</h3>
+<pre><code>.buchen { background: linear-gradient(160deg, var(--farbe-tief), var(--farbe-akzent)); }</code></pre>
+    <h3>Dunkelgrün für Knöpfe, Gold bei Hover</h3>
+<pre><code>:root { --farbe-akzent: #1f4d3a; }
+.knopf:hover { background: var(--farbe-gold); color: #161616; }</code></pre>
+    <h3>Foto im Anfang als Hintergrundbild aus der Verwaltung</h3>
+<pre><code>html[data-hero="vollbild"] .hero-bild img { object-position: 50% 30%; }</code></pre>
+
+    <h2 id="tipps">Tipps</h2>
+    <ul>
+      <li>Fangt mit einer Vorlage an und ändert wenig. Eine ruhige Seite wirkt festlicher als eine überladene.</li>
+      <li>Prüft die Vorschau auf <strong>Handy</strong>. Die meisten Gäste öffnen den Link auf dem Telefon.</li>
+      <li>Achtet auf Kontrast. Textfarbe und Hintergrund sollten sich deutlich unterscheiden, besonders in der Zusage.</li>
+      <li>Versucht es mit Variablen statt mit festen Farben, dann passt sich das Design an, wenn ihr später eine Vorlage wechselt.</li>
+      <li>Wenn etwas nicht aussieht wie gedacht: Pro-Modus-Felder leeren, Vorschau neu laden und Zeile für Zeile wieder einfügen.</li>
+    </ul>
+    <p><a href="/admin.html">Zurück zur Verwaltung</a></p>
+  </main>
+</div>
+</body>
+</html>

@@ -40,6 +40,7 @@
       <button type="button" data-reiter="inhalte"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>Inhalte</button>
       <button type="button" data-reiter="gaestefotos"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>Gästefotos <span class="zaehler-marke" id="gf-marke" hidden></span></button>
       <button type="button" data-reiter="qr"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h3M21 17v4"/></svg>QR-Code</button>
+      <button type="button" data-reiter="design"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A3.6 3.6 0 0 0 21 9.8C21 6 17 3 12 3z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="10.5" r="1"/></svg>Design</button>
       <button type="button" data-reiter="angaben"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>Angaben</button>
     </nav>
     <div class="kopf-rechts">
@@ -394,6 +395,32 @@
       </div>
     </section>
 
+    <section data-bereich="design" hidden>
+      <div class="dsg">
+        <div class="dsg-steuerung">
+          <div class="dsg-kopf">
+            <div><h2>Design der Gästeseite</h2><p class="hilfe" id="dsg-status">Lädt …</p></div>
+            <div class="reihe"><button type="button" class="knopf" id="dsg-veroeffentlichen" disabled>Veröffentlichen</button><button type="button" class="knopf leise" id="dsg-verwerfen" disabled>Entwurf verwerfen</button></div>
+          </div>
+          <details class="block" open><summary>Vorlage wählen</summary><p class="hilfe">Eine Vorlage setzt Farben, Schrift, Formen und Aufbau auf einmal. Danach lässt sich alles einzeln ändern.</p><div id="dsg-vorlagen" class="dsg-vorlagen"></div></details>
+          <details class="block"><summary>Farben</summary><div id="dsg-farben" class="dsg-farben"></div></details>
+          <details class="block"><summary>Schrift und Formen</summary><div id="dsg-formen"></div></details>
+          <details class="block"><summary>Aufbau der Startseite</summary><div id="dsg-aufbau"></div></details>
+          <details class="block"><summary>Eigene Blöcke</summary><p class="hilfe">Text, Zitate, Bilder, Knöpfe und Trenner an der Stelle, die ihr wählt.</p><div id="dsg-bloecke"></div><div class="reihe"><select id="dsg-block-neu" aria-label="Block hinzufügen"></select><button type="button" class="knopf leise" id="dsg-block-hinzu">Block hinzufügen</button></div></details>
+          <details class="block"><summary>Pro-Modus: eigenes HTML und CSS</summary>
+            <p class="hilfe">Für alle, die es genau haben wollen. Erlaubt sind HTML und CSS, kein JavaScript. Klassen, Variablen und Beispiele stehen in der <a href="/hilfe-design.html" target="_blank" rel="noopener">Dokumentation</a>.</p>
+            <label>CSS<textarea id="dsg-css" class="code" rows="10" spellcheck="false" placeholder=".hero { ... }"></textarea></label>
+            <label>HTML über dem Inhalt der Startseite<textarea id="dsg-html-oben" class="code" rows="5" spellcheck="false"></textarea></label>
+            <label>HTML unter dem Inhalt der Startseite<textarea id="dsg-html-unten" class="code" rows="5" spellcheck="false"></textarea></label>
+          </details>
+        </div>
+        <div class="dsg-vorschau">
+          <div class="leiste"><div class="filter" role="group" aria-label="Vorschau"><button type="button" data-dsg-breite="voll" aria-pressed="true">Computer</button><button type="button" data-dsg-breite="handy" aria-pressed="false">Handy</button></div><a class="knopf leise" id="dsg-extern" href="/?entwurf=1" target="_blank" rel="noopener">In neuem Tab</a></div>
+          <div class="dsg-rahmen" id="dsg-rahmen"><iframe id="dsg-iframe" title="Vorschau der Gästeseite" src="about:blank"></iframe></div>
+        </div>
+      </div>
+    </section>
+
     <section data-bereich="angaben" hidden>
       <form class="block breit" id="angaben-form">
         <h2>Was die Gäste sehen</h2>
@@ -447,14 +474,8 @@
           <label>E-Mail<input name="tz2_mail" type="email"></label>
         </div>
         <p class="hilfe">Die Kontaktseite zeigt diese E-Mail und die Trauzeugen. Sobald mindestens ein Name eingetragen ist, erscheint im Antwortformular auch der Hinweis auf die Trauzeugen.</p>
-        <h3>Farben</h3>
-        <div class="raster">
-          <label>Hauptfarbe (Überschriften, Knöpfe)<input name="design_akzent" type="color" value="#3f5a4d"></label>
-          <label>Hintergrund<input name="design_grund" type="color" value="#faf9f6"></label>
-          <label>Textfarbe<input name="design_text" type="color" value="#25282b"></label>
-        </div>
-        <div class="reihe"><button type="button" class="knopf leise" id="farben-standard">Standardfarben wiederherstellen</button></div>
-        <p class="hilfe">Wählt einen hellen Hintergrund und eine dunkle Textfarbe, damit alles gut lesbar bleibt. Nach dem Speichern gelten die Farben für alle Gäste. Die Verwaltung behält ihre Farben.</p>
+        <h3>Farben und Aussehen</h3>
+        <p class="hilfe">Farben, Schrift, Aufbau und eigene Blöcke der Gästeseite stellt ihr im Reiter <a href="#" data-zu-reiter="design">Design</a> ein.</p>
         <h3>Sonstiges</h3>
         <div class="raster">
           <label>Kontakt bei Fragen<input name="contact" placeholder="Anna: 0170 …"></label>
@@ -505,5 +526,6 @@
 <script src="/js/admin-planung.js" type="module"></script>
 <script src="/js/admin-fotos.js" type="module"></script>
 <script src="/js/admin-ablauf.js" type="module"></script>
+<script src="/js/admin-design.js" type="module"></script>
 </body>
 </html>

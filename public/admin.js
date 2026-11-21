@@ -151,14 +151,10 @@ document.addEventListener('click', async (e) => {
 function personenListe(r) { try { const l = JSON.parse(r.personen || '[]'); return Array.isArray(l) ? l : []; } catch { return []; } }
 
 /* Angaben */
-// Standardfarben der Gästeseite, gleich wie in public/style.css. Ein leerer Wert in den Angaben heißt: Standard.
-const FARBEN = { design_akzent: '#3f5a4d', design_grund: '#faf9f6', design_text: '#25282b' };
 async function ladeAngaben() {
   const s = await api('/api/admin/settings');
   const f = $('#angaben-form');
   for (const [k, v] of Object.entries(s)) if (f.elements[k]) f.elements[k].value = v;
-  // Farbfelder können nicht leer sein: ohne gespeicherten Wert zeigen sie die Standardfarbe
-  for (const [k, standard] of Object.entries(FARBEN)) f.elements[k].value = s[k] || standard;
   const img = $('#foto-vorschau');
   img.src = `/foto?t=${Date.now()}`;
   img.onload = () => (img.hidden = false);
@@ -167,15 +163,12 @@ async function ladeAngaben() {
 $('#angaben-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const body = Object.fromEntries(new FormData(e.target));
-  for (const [k, standard] of Object.entries(FARBEN)) if (String(body[k]).toLowerCase() === standard) body[k] = '';
   await api('/api/admin/settings', { method: 'PUT', body });
   const ok = $('#angaben-ok');
   ok.hidden = false;
   setTimeout(() => (ok.hidden = true), 2500);
 });
-$('#farben-standard').addEventListener('click', () => {
-  for (const [k, standard] of Object.entries(FARBEN)) $('#angaben-form').elements[k].value = standard;
-});
+document.addEventListener('click', (e) => { const a = e.target.closest('[data-zu-reiter]'); if (a) { e.preventDefault(); reiter(a.dataset.zuReiter); } });
 $('#foto-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const file = $('#foto').files[0];

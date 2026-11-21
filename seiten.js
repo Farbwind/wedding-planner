@@ -23,38 +23,12 @@ const SYMBOLE = `<svg width="0" height="0" style="position:absolute" aria-hidden
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-export function seitenGeruest({ VERSION, PUB, getSettings }) {
+import { aufbereiten } from './design.js';
+
+export function seitenGeruest({ VERSION, PUB, getSettings, getDesign }) {
   const v = (pfad) => `${pfad}?v=${VERSION}`;
 
-  // Farben aus der Verwaltung (Angaben design_akzent, design_grund, design_text).
-  // Nur gültige Werte im Format #rrggbb kommen ins CSS, alles andere bleibt bei style.css.
-  const HEX = /^#[0-9a-fA-F]{6}$/;
-  const STANDARD = { grund: '#faf9f6', text: '#25282b' };
-  // Mischt zwei Hex-Farben: anteil 0 ergibt a, 1 ergibt b
-  function mischen(a, b, anteil) {
-    const kanal = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
-    const wert = (i) => Math.round(kanal(a, i) + (kanal(b, i) - kanal(a, i)) * anteil).toString(16).padStart(2, '0');
-    return `#${wert(0)}${wert(1)}${wert(2)}`;
-  }
-  function designCss() {
-    const s = getSettings();
-    const akzent = HEX.test(s.design_akzent) ? s.design_akzent.toLowerCase() : '';
-    const grund = HEX.test(s.design_grund) ? s.design_grund.toLowerCase() : '';
-    const text = HEX.test(s.design_text) ? s.design_text.toLowerCase() : '';
-    const zeilen = [];
-    if (akzent) {
-      zeilen.push(`--farbe-akzent: ${akzent}`, `--farbe-akzent-dunkel: ${mischen(akzent, '#000000', 0.25)}`, `--farbe-akzent-hell: ${mischen(akzent, '#ffffff', 0.88)}`);
-    }
-    // Abgeleitete Farben folgen Hintergrund und Text, damit Bänder, Linien und Nebentexte dazu passen
-    const grundWirksam = grund || STANDARD.grund;
-    const textWirksam = text || STANDARD.text;
-    if (grund) {
-      zeilen.push(`--farbe-grund: ${grund}`, `--farbe-band: ${mischen(grund, textWirksam, 0.06)}`, `--farbe-linie: ${mischen(grund, textWirksam, 0.12)}`);
-    }
-    if (text) zeilen.push(`--farbe-text: ${text}`);
-    if (text || grund) zeilen.push(`--farbe-text-weich: ${mischen(textWirksam, grundWirksam, 0.3)}`);
-    return zeilen.length ? `<style>:root { ${zeilen.join('; ')}; }</style>` : '';
-  }
+  // Aussehen: Vorlage, Farben, Schrift, Formen, Elemente und Pro-Modus kommen aus design.js
 
   // „Anna & Ben“ oder „Anna und Ben“ in zwei Namen zerlegen
   function paar() {
@@ -64,13 +38,17 @@ export function seitenGeruest({ VERSION, PUB, getSettings }) {
   }
   const titelVon = { start: (p) => `${p.voll} heiraten`, geschichte: () => 'Unsere Geschichte', quiz: () => 'Quiz', fotos: () => 'Eure Fotos', kontakt: () => 'Kontakt' };
 
-  function layout({ name, titel, inhalt, skript, beschreibung }) {
+  function layout({ name, titel, inhalt, skript, beschreibung, design }) {
     const p = paar();
+    const a = aufbereiten(design || getDesign());
+    if (name === 'start') {
+      inhalt = inhalt.replace('<main>', `<main>\n<div class="pro-oben" style="order:-1">${a.oben}</div>`).replace('</main>', `${a.bloecke}\n<div class="pro-unten" style="order:9999">${a.unten}</div>\n</main>`);
+    }
     const menue = MENUE.map(([href, text, seite]) =>
       `<a href="${href}"${seite === name && name !== 'start' ? ' aria-current="page"' : ''}>${esc(text)}</a>`).join('\n      ');
     const seitenTitel = name === 'start' ? titel : `${titel} · ${p.voll}`;
     return `<!doctype html>
-<html lang="de">
+<html lang="de"${a.attribute}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -80,7 +58,7 @@ export function seitenGeruest({ VERSION, PUB, getSettings }) {
 <link rel="icon" href="/img/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${v('/style.css')}">
-${designCss()}
+<style id="design">${a.css}</style>${a.proCss ? `<style id="pro-css">${a.proCss}</style>` : ''}
 </head>
 <body class="seite-${name}">
 ${SYMBOLE}
@@ -108,10 +86,10 @@ ${skript ? `<script src="${v(skript)}" type="module"></script>` : ''}
   const SKRIPTE = { start: '/app.js', geschichte: '/js/geschichte.js', quiz: '/js/quiz.js', fotos: '/js/fotos.js', kontakt: '/js/kontakt.js' };
 
   // Die Seite wird bei jedem Aufruf frisch gebaut, damit geänderte Namen aus der Verwaltung sofort erscheinen
-  function seite(name) {
+  function seite(name, design) {
     const inhalt = fs.readFileSync(path.join(PUB, 'seiten', `${name}.html`), 'utf8');
     const p = paar();
-    return layout({ name, titel: titelVon[name](p), inhalt, skript: SKRIPTE[name] });
+    return layout({ name, titel: titelVon[name](p), inhalt, skript: SKRIPTE[name], design });
   }
 
   return { layout, seite };

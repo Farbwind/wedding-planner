@@ -153,6 +153,7 @@ function countdownStarten(i) {
 // Konfetti nach der Zusage
 function konfetti() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if ((document.documentElement.dataset.aus || '').split(' ').includes('konfetti')) return; // im Designer abgeschaltet
   const farben = ['#b88a45', '#f4e3bf', '#ffffff', 'var(--farbe-akzent-hell)', '#d9b36a'];
   const box = document.createElement('div');
   box.className = 'konfetti';

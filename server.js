@@ -13,8 +13,9 @@ import { planung } from './planung.js';
 import { gaestefotos } from './gaestefotos.js';
 import { ablauf } from './ablauf.js';
 import { personenVon, kostZahlen, bereinigen } from './essen.js';
+import { bereinigen as designPruefen, standardDesign, VORLAGEN, SCHRIFTEN, SEKTIONEN, ELEMENTE, HEROS, BLOCKTYPEN } from './design.js';
 
-const VERSION = '1.9.0';
+const VERSION = '2.0.0';
 const PORT = Number(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || './data';
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'http://localhost:8080').replace(/\/$/, '');
@@ -235,10 +236,10 @@ async function readBody(req, limit = 64 * 1024) {
   }
   return Buffer.concat(chunks);
 }
-async function readJson(req) {
+async function readJson(req, limit) {
   if (!String(req.headers['content-type'] || '').includes('application/json'))
     throw Object.assign(new Error('Falsches Format'), { status: 415 });
-  try { return JSON.parse((await readBody(req)).toString('utf8') || '{}'); }
+  try { return JSON.parse((await readBody(req, limit)).toString('utf8') || '{}'); }
   catch { throw Object.assign(new Error('Ungültige Daten'), { status: 400 }); }
 }
 
@@ -667,6 +668,31 @@ async function admin(req, res, url) {
       return json(res, 200, getSettings());
     }
   }
+  if (p === '/api/admin/design' && req.method === 'GET') {
+    return json(res, 200, {
+      live: liveDesign(), entwurf: holeJson('design_entwurf'),
+      vorlagen: Object.entries(VORLAGEN).map(([id, v]) => ({ id, name: v.name, beschreibung: v.beschreibung, design: v.design })),
+      schriften: Object.entries(SCHRIFTEN).map(([id, s]) => ({ id, name: s.name, beschreibung: s.beschreibung, titel: s.stapelTitel, text: s.stapelText, schreib: s.stapelName || '' })),
+      sektionen: SEKTIONEN, elemente: ELEMENTE, heros: HEROS, blocktypen: BLOCKTYPEN,
+    });
+  }
+  if (p === '/api/admin/design/entwurf' && req.method === 'PUT') {
+    const b = await readJson(req, 512 * 1024);
+    const d = designPruefen(b.design);
+    speichereJson('design_entwurf', d);
+    return json(res, 200, { ok: true, design: d });
+  }
+  if (p === '/api/admin/design/entwurf' && req.method === 'DELETE') {
+    db.prepare("DELETE FROM settings WHERE key = 'design_entwurf'").run();
+    return json(res, 200, { ok: true });
+  }
+  if (p === '/api/admin/design/veroeffentlichen' && req.method === 'POST') {
+    const d = holeJson('design_entwurf');
+    if (!d) return json(res, 400, { error: 'Es gibt keinen Entwurf zum Veröffentlichen.' });
+    speichereJson('design_json', designPruefen(d));
+    db.prepare("DELETE FROM settings WHERE key = 'design_entwurf'").run();
+    return json(res, 200, { ok: true });
+  }
   if (p === '/api/admin/photo') {
     const f = path.join(DATA, 'foto.jpg');
     if (req.method === 'DELETE') { fs.rmSync(f, { force: true }); return json(res, 200, { ok: true }); }
@@ -724,7 +750,18 @@ async function admin(req, res, url) {
   return json(res, 404, { error: 'Nicht gefunden.' });
 }
 
-const geruest = seitenGeruest({ VERSION, PUB, getSettings });
+// Design der Gästeseite (veröffentlicht und Entwurf), siehe design.js
+const holeJson = (k) => { try { const r = db.prepare('SELECT value FROM settings WHERE key = ?').get(k); return r ? JSON.parse(r.value) : null; } catch { return null; } };
+const speichereJson = (k, v) => db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(k, JSON.stringify(v));
+// Vor dem Designer gab es nur drei Farben in den Angaben: sie bleiben gültig, solange kein Design gespeichert ist
+function altesDesign() {
+  const d = standardDesign(); const s = getSettings();
+  for (const [k, f] of [['akzent', 'design_akzent'], ['grund', 'design_grund'], ['text', 'design_text']]) if (/^#[0-9a-fA-F]{6}$/.test(s[f])) d.farben[k] = s[f].toLowerCase();
+  return d;
+}
+const liveDesign = () => holeJson('design_json') || altesDesign();
+const CSP = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'";
+const geruest = seitenGeruest({ VERSION, PUB, getSettings, getDesign: liveDesign });
 const behandleInhalte = inhalte({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, gruppenAusListe: () => behandlePlanung.gruppenJeAntwort() });
 const behandlePlanung = planung({ db, json, send, str, int, sessionUser, getSettings });
 const behandleFotos = gaestefotos({ db, send, json, str, int, sessionUser, limited, clientIp, DATA, getSettings, PUBLIC_URL });
@@ -757,10 +794,12 @@ const server = http.createServer(async (req, res) => {
     if (p === '/impressum' || p === '/datenschutz') return send(res, 200, rechtsSeite(p.slice(1)), 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache' });
     if (p === '/admin/einmal' && req.method === 'GET') return einmalAnmeldung(req, res, url);
     if (p === '/admin' || p === '/admin/') return serveHtml(res, 'admin.html');
-    const html = (inhalt) => send(res, 200, inhalt, 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache' });
-    if (p === '/' || /^\/p\/[A-Za-z0-9-]{3,16}\/?$/.test(p)) return html(geruest.seite('start'));
+    const html = (inhalt) => send(res, 200, inhalt, 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache', 'Content-Security-Policy': CSP });
+    // Vorschau im Designer: wer angemeldet ist, sieht mit ?entwurf=1 den Entwurf
+    const entwurf = url.searchParams.get('entwurf') === '1' && sessionUser(req) ? (holeJson('design_entwurf') || liveDesign()) : undefined;
+    if (p === '/' || /^\/p\/[A-Za-z0-9-]{3,16}\/?$/.test(p)) return html(geruest.seite('start', entwurf));
     const unterseite = p.replace(/\/$/, '').slice(1);
-    if (UNTERSEITEN.includes(unterseite)) return html(geruest.seite(unterseite));
+    if (UNTERSEITEN.includes(unterseite)) return html(geruest.seite(unterseite, entwurf));
     return serveStatic(req, res, p);
   } catch (e) {
     if (!e.status) console.error(e);
